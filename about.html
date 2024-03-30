@@ -1,0 +1,6 @@
+--- layout: page title: "About" description: "「生活需要诗意,人生需要美景」"
+header-img: "img/bg-me-2022.jpg" header-mask: 0.3 multilingual: true --- {%
+include multilingual-sel.html %} {% capture about_zh %}{% include about/zh.md
+%}{% endcapture %} {{ about_zh | markdownify }} {% capture about_en %}{% include
+about/en.md %}{% endcapture %} {{ about_en | markdownify }} {% if
+site.disqus_username %} {% endif %}

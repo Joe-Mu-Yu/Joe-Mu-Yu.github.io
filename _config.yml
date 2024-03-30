@@ -1,0 +1,60 @@
+# Site settings
+
+title: Joen Blog
+SEOTitle: Joen的博客 | Joen Blog
+header-img: img/home-bg.jpg
+email: joerocker516@gmail.com
+description: "这里是 @Joen 的个人博客，与你一起发现更大的世界 | 要做一个有格调的人"
+keyword: "无限进步,持续学习,学不明白的代码"
+url: "http://Joe-Mu-Yu.github.io"
+baseurl: ""
+github_repo: "https://github.com/Joe-Mu-Yu/Joe-Mu-Yu.github.io"
+
+future: true
+
+RSS: false
+weibo_username: Joen
+zhihu_username: Joen
+github_username: Joen
+
+highlighter: rouge
+permalink: pretty
+paginate: 10
+exclude:
+  [
+    "less",
+    "node_modules",
+    "Gruntfile.js",
+    "package.json",
+    "README.md",
+    "README.zh.md",
+  ]
+anchorjs: true
+
+plugins: [jekyll-paginate]
+
+markdown: kramdown
+kramdown:
+  input: GFM # use Github Flavored Markdown !important
+  syntax_highlighter_opts:
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+      start_line: 1
+
+disqus_username: Joen
+
+netease_comment: false
+
+sidebar: true
+sidebar-about-description: "要做一个有格调的人 <br> React Team @ Meta"
+sidebar-avatar: https://github.com/Joen.png
+
+featured-tags: true
+featured-condition-size: 1
+
+chrome-tab-theme-color: "#000000"
+service-worker: true
+
+page-mathjax: false
