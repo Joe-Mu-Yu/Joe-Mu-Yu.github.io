@@ -1,0 +1,239 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import CategoryTag from '../components/CategoryTag.astro';
+import Button from '../components/Button.astro';
+
+// 示例文章数据 - 请替换为你自己的内容
+const posts = [
+  {
+    title: '我的第一篇博客',
+    description: '欢迎来到我的个人博客，这里将分享我的技术心得、生活感悟和项目经验。',
+    date: new Date(),
+    tags: ['随笔'],
+    href: '#'
+  }
+  // 添加更多文章...
+];
+
+// 示例项目数据 - 请替换为你自己的项目
+const projects = [
+  {
+    title: '我的第一个项目',
+    description: '这里展示你的开源项目或个人作品',
+    href: '#',
+    icon: '🚀'
+  }
+  // 添加更多项目...
+];
+
+const categories = ['前端', '项目', '工具', '生活'];
+---
+
+<BaseLayout title="Morgan - Personal Blog">
+  <section class="hero container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 data-i18n="home.greeting">Hi, Morgan</h1>
+        <p class="bio" data-i18n="home.bio">
+          编程爱好者 / AI爱好者 / 探索生活的美好
+        </p>
+        <div class="social-links">
+          <Button variant="outline" href="https://github.com/Joe-Mu-Yu">GitHub</Button>
+        </div>
+      </div>
+      <div class="hero-avatar">
+        <img src="/avatar.jpg" alt="Morgan" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="section-header">
+      <h2 data-i18n="home.articles">文章</h2>
+      <div class="categories">
+        {categories.map(cat => <CategoryTag tag={cat} />)}
+      </div>
+    </div>
+    
+    <div class="posts-grid">
+      {posts.map(post => (
+        <ArticleCard {...post} />
+      ))}
+    </div>
+    
+    <div class="view-more">
+      <Button href="/posts" variant="secondary"><span data-i18n="home.viewAllPosts">查看所有文章</span></Button>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="section-header">
+      <h2 data-i18n="home.projectsTitle">项目</h2>
+    </div>
+    
+    <div class="projects-grid">
+      {projects.map(project => (
+        <ProjectCard {...project} />
+      ))}
+    </div>
+    
+    <div class="view-more">
+      <Button href="/projects" variant="secondary"><span data-i18n="home.viewAllProjects">查看所有项目</span></Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: 6rem 1rem 4rem;
+  }
+
+  .hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .hero-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .hero-avatar {
+    flex-shrink: 0;
+  }
+
+  .hero-avatar img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+  }
+
+  .hero-avatar img:hover {
+    transform: scale(1.05);
+  }
+
+  h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .bio {
+    font-size: 1.25rem;
+    color: var(--color-secondary);
+    max-width: 600px;
+    margin: 0 auto 2rem;
+  }
+
+  .social-links {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+
+  .section {
+    padding: 4rem 1rem;
+  }
+
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .posts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .view-more {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    h1 { font-size: 2.5rem; }
+    
+    .hero-content {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .hero-text {
+      text-align: center;
+    }
+
+    .social-links {
+      justify-content: center;
+    }
+
+    .hero-avatar img {
+      width: 150px;
+      height: 150px;
+    }
+  }
+</style>
+
+<script>
+  import { translations, type Language } from '../i18n/index.ts';
+
+  function updateLanguage() {
+    const lang = (localStorage.getItem('language') || 'zh') as Language;
+    const elements = document.querySelectorAll('[data-i18n]');
+    
+    elements.forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (key) {
+        const keys = key.split('.');
+        let value: any = translations[lang];
+        
+        for (const k of keys) {
+          if (value && typeof value === 'object') {
+            value = value[k];
+          }
+        }
+        
+        if (typeof value === 'string') {
+          el.textContent = value;
+        }
+      }
+    });
+  }
+
+  // 页面加载时更新语言
+  updateLanguage();
+
+  // 监听语言切换事件
+  window.addEventListener('languageChanged', () => {
+    updateLanguage();
+  });
+</script>

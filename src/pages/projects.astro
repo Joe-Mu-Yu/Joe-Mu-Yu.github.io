@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+
+// 示例项目数据 - 请替换为你自己的项目
+const projects = [
+  {
+    title: '我的第一个项目',
+    description: '这里展示你的开源项目或个人作品',
+    href: '#',
+    icon: '🚀'
+  }
+  // 添加更多项目...
+];
+---
+
+<BaseLayout title="Projects - Morgan">
+  <div class="container section">
+    <h1>项目</h1>
+    <div class="projects-grid">
+      {projects.map(project => (
+        <ProjectCard {...project} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .section {
+    padding: 4rem 1rem;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--color-primary);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+</style>

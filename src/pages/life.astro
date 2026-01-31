@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="生活 - Morgan">
+  <div class="container section">
+    <h1>生活</h1>
+    <div class="content">
+      <p>分享生活中的点滴瞬间和感悟</p>
+      
+      <div class="life-posts">
+        <p class="placeholder">生活相关的文章将显示在这里...</p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .section {
+    padding: 4rem 1rem;
+    max-width: 900px;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--color-primary);
+  }
+
+  .content {
+    font-size: 1.1rem;
+    color: var(--color-secondary);
+    line-height: 1.8;
+  }
+
+  .life-posts {
+    margin-top: 3rem;
+  }
+
+  .placeholder {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-secondary);
+    font-style: italic;
+  }
+</style>

@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+---
+
+<BaseLayout title="404 Not Found">
+  <div class="container section">
+    <h1>404</h1>
+    <p>页面未找到。或者它从未存在过。</p>
+    <div class="actions">
+      <Button href="/">返回首页</Button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .section {
+    padding: 8rem 1rem;
+    text-align: center;
+  }
+  
+  h1 {
+    font-size: 6rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+  }
+
+  p {
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+    margin-bottom: 2rem;
+  }
+</style>

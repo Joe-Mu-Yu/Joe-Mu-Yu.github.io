@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import InteractiveMap from '../components/InteractiveMap.astro';
+---
+
+<BaseLayout title="About - Morgan">
+  <div class="container section">
+    <h1>关于我</h1>
+    <div class="content">
+      <p>Hi, 我是 Morgan。</p>
+      <p>编程爱好者 / AI爱好者 / 探索生活的美好</p>
+      
+      <InteractiveMap />
+      
+      <h2>我的技能</h2>
+      <ul>
+        <li>Frontend: React, Vue, Astro</li>
+        <li>Backend: Node.js, Python</li>
+        <li>DevOps: Docker, CI/CD</li>
+      </ul>
+
+      <h2>联系我</h2>
+      <p>
+        Email: <a href="mailto:joerocker516@gmail.com">joerocker516@gmail.com</a><br/>
+        GitHub: <a href="https://github.com/Joe-Mu-Yu">@Joe-Mu-Yu</a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .section {
+    padding: 4rem 1rem;
+    max-width: 700px;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--color-primary);
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin: 2rem 0 1rem;
+    color: var(--color-primary);
+  }
+
+  .content {
+    font-size: 1.1rem;
+    color: var(--color-secondary);
+    line-height: 1.8;
+  }
+
+  ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

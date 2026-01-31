@@ -1,0 +1,35 @@
+---
+const today = new Date();
+---
+
+<footer>
+  <div class="container">
+    <p>
+      &copy; {today.getFullYear()} Morgan. All rights reserved.
+      <span class="separator">|</span>
+      <a href="/rss.xml">RSS</a>
+    </p>
+    <p class="runtime">已运行 1 天</p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    padding: 3rem 0;
+    margin-top: 4rem;
+    text-align: center;
+    color: var(--color-secondary);
+    font-size: 0.9rem;
+  }
+  
+  .separator {
+    margin: 0 0.5rem;
+    opacity: 0.5;
+  }
+  
+  .runtime {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+</style>

@@ -1,0 +1,92 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import LanguageToggle from './LanguageToggle.astro';
+---
+
+<header>
+  <div class="container header-inner">
+    <a href="/" class="logo">Morgan</a>
+    
+    <nav>
+      <ul>
+        <li><a href="/" data-i18n="nav.home">首页</a></li>
+        <li><a href="/posts" data-i18n="nav.posts">文章</a></li>
+        <li><a href="/projects" data-i18n="nav.projects">项目</a></li>
+        <li><a href="/life" data-i18n="nav.life">生活</a></li>
+        <li><a href="/about" data-i18n="nav.about">关于</a></li>
+        <li><LanguageToggle /></li>
+        <li><ThemeToggle /></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  header {
+    padding: 2rem 0;
+  }
+  
+  .header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  
+  nav ul {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  nav a {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-secondary);
+    transition: color 0.2s;
+  }
+  
+  nav a:hover {
+    color: var(--color-primary);
+  }
+</style>
+
+<script>
+  import { translations, type Language } from '../i18n/index.ts';
+
+  function updateLanguage() {
+    const lang = (localStorage.getItem('language') || 'zh') as Language;
+    const elements = document.querySelectorAll('[data-i18n]');
+    
+    elements.forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (key) {
+        const keys = key.split('.');
+        let value: any = translations[lang];
+        
+        for (const k of keys) {
+          if (value && typeof value === 'object') {
+            value = value[k];
+          }
+        }
+        
+        if (typeof value === 'string') {
+          el.textContent = value;
+        }
+      }
+    });
+  }
+
+  // 页面加载时更新语言
+  updateLanguage();
+
+  // 监听语言切换事件
+  window.addEventListener('languageChanged', () => {
+    updateLanguage();
+  });
+</script>

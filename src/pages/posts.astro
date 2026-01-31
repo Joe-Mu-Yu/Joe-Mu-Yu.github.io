@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+
+// 示例文章数据 - 请替换为你自己的内容
+const posts = [
+  {
+    title: '我的第一篇博客',
+    description: '欢迎来到我的个人博客，这里将分享我的技术心得、生活感悟和项目经验。',
+    date: new Date(),
+    tags: ['随笔'],
+    href: '#'
+  }
+  // 添加更多文章...
+];
+---
+
+<BaseLayout title="Posts - Morgan">
+  <div class="container section">
+    <h1>文章</h1>
+    <div class="posts-grid">
+      {posts.map(post => (
+        <ArticleCard {...post} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .section {
+    padding: 4rem 1rem;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--color-primary);
+  }
+
+  .posts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+</style>

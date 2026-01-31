@@ -1,0 +1,181 @@
+---
+// 语言切换下拉组件
+---
+
+<div class="language-selector">
+  <button class="lang-button" id="langButton">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m5 8 6 6"/>
+      <path d="m4 14 6-6 2-3"/>
+      <path d="M2 5h12"/>
+      <path d="M7 2h1"/>
+      <path d="m22 22-5-10-5 10"/>
+      <path d="M14 18h6"/>
+    </svg>
+    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </button>
+  
+  <div class="lang-dropdown" id="langDropdown">
+    <a href="#" class="lang-option active" data-lang="zh">中文</a>
+    <a href="#" class="lang-option" data-lang="en">English</a>
+  </div>
+</div>
+
+<style>
+  .language-selector {
+    position: relative;
+  }
+
+  .lang-button {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-secondary);
+    transition: color 0.2s;
+    border-radius: 4px;
+  }
+
+  .lang-button:hover {
+    color: var(--color-primary);
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .lang-button svg {
+    flex-shrink: 0;
+  }
+
+  .arrow {
+    transition: transform 0.2s;
+  }
+
+  .lang-button.active .arrow {
+    transform: rotate(180deg);
+  }
+
+  .lang-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 120px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s;
+    z-index: 1000;
+    overflow: hidden;
+  }
+
+  .lang-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .lang-option {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--color-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .lang-option:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--color-primary);
+  }
+
+  .lang-option.active {
+    color: var(--color-primary);
+    font-weight: 600;
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .lang-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-dropdown {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-option:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+</style>
+
+<script>
+  const langButton = document.getElementById('langButton');
+  const langDropdown = document.getElementById('langDropdown');
+  const langOptions = document.querySelectorAll('.lang-option');
+
+  // 从 localStorage 获取当前语言，默认为中文
+  let currentLang = localStorage.getItem('language') || 'zh';
+  
+  // 初始化：设置当前激活的语言选项
+  langOptions.forEach(option => {
+    const lang = option.getAttribute('data-lang');
+    if (lang === currentLang) {
+      option.classList.add('active');
+    } else {
+      option.classList.remove('active');
+    }
+  });
+
+  // 切换下拉菜单显示/隐藏
+  langButton?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    langButton.classList.toggle('active');
+    langDropdown?.classList.toggle('show');
+  });
+
+  // 点击语言选项
+  langOptions.forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const selectedLang = option.getAttribute('data-lang');
+      
+      if (selectedLang && selectedLang !== currentLang) {
+        // 保存选择的语言
+        currentLang = selectedLang;
+        localStorage.setItem('language', selectedLang);
+        
+        // 更新激活状态
+        langOptions.forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+        
+        // 关闭下拉菜单
+        langButton?.classList.remove('active');
+        langDropdown?.classList.remove('show');
+        
+        // 触发语言切换事件
+        window.dispatchEvent(new CustomEvent('languageChanged', { 
+          detail: { language: selectedLang } 
+        }));
+        
+        // 刷新页面以应用新语言
+        window.location.reload();
+      }
+    });
+  });
+
+  // 点击页面其他地方关闭下拉菜单
+  document.addEventListener('click', () => {
+    langButton?.classList.remove('active');
+    langDropdown?.classList.remove('show');
+  });
+</script>

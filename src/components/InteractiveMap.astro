@@ -1,0 +1,196 @@
+---
+// 简化的中国地图组件 - 使用静态图片+标记点
+interface Pin {
+  name: string;
+  position: { top: string; left: string }; // 相对位置百分比
+}
+
+// 旅行地点数据（使用相对位置）
+const travelPins: Pin[] = [
+  { name: '北京', position: { top: '30%', left: '60%' } },
+  { name: '上海', position: { top: '48%', left: '68%' } },
+  { name: '成都', position: { top: '52%', left: '45%' } },
+  { name: '西安', position: { top: '42%', left: '50%' } },
+  { name: '杭州', position: { top: '50%', left: '66%' } },
+  { name: '深圳', position: { top: '72%', left: '60%' } },
+];
+---
+
+<div class="map-container">
+  <div class="china-map-wrapper">
+    <!-- 使用中国地图背景 -->
+    <div class="china-map-bg"></div>
+    
+    <!-- 旅行地点标记 -->
+    {travelPins.map(pin => (
+      <div 
+        class="travel-marker" 
+        style={`top: ${pin.position.top}; left: ${pin.position.left};`}
+        data-name={pin.name}
+      >
+        <span class="flag">🚩</span>
+        <span class="tooltip">{pin.name}</span>
+      </div>
+    ))}
+  </div>
+  
+  <div class="map-legend">
+    <div class="legend-item">
+      <span class="flag-icon">🚩</span>
+      <span>旅行地</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .map-container {
+    position: relative;
+    width: 100%;
+    margin: 2rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #f0f4f8;
+  }
+
+  .china-map-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 75%; /* 4:3 宽高比 */
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  }
+
+  .china-map-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><path d="M400 100 L500 150 L580 200 L620 280 L600 380 L550 450 L450 480 L350 450 L280 380 L250 280 L280 200 L350 150 Z" fill="%23e0e0e0" stroke="%23999" stroke-width="2"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.3;
+  }
+
+  .travel-marker {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 5;
+  }
+
+  .travel-marker .flag {
+    display: block;
+    font-size: 28px;
+    filter: hue-rotate(15deg) saturate(1.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    animation: wave 2s ease-in-out infinite;
+  }
+
+  @keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+  }
+
+  .travel-marker:hover {
+    z-index: 10;
+  }
+
+  .travel-marker:hover .flag {
+    transform: scale(1.2);
+    filter: hue-rotate(15deg) saturate(1.5) brightness(1.1);
+  }
+
+  .tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 140, 0, 0.95);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(255, 140, 0, 0.95);
+  }
+
+  .travel-marker:hover .tooltip {
+    opacity: 1;
+  }
+
+  .map-legend {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #333;
+  }
+
+  .flag-icon {
+    font-size: 1.2rem;
+    filter: hue-rotate(15deg);
+  }
+
+  @media (max-width: 768px) {
+    .china-map-wrapper {
+      padding-bottom: 100%; /* 移动端使用正方形 */
+    }
+
+    .travel-marker .flag {
+      font-size: 24px;
+    }
+
+    .tooltip {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .map-container {
+      background: #1a1a1a;
+    }
+
+    .china-map-wrapper {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+    }
+
+    .map-legend {
+      background: rgba(30, 30, 30, 0.95);
+    }
+
+    .legend-item {
+      color: #e0e0e0;
+    }
+  }
+</style>

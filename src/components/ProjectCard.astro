@@ -1,0 +1,59 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  href: string;
+  icon?: string;
+}
+
+const { title, description, href, icon } = Astro.props;
+---
+
+<a href={href} class="project-card" target="_blank" rel="noopener noreferrer">
+  <div class="header">
+    {icon && <span class="icon">{icon}</span>}
+    <h3>{title}</h3>
+  </div>
+  <p>{description}</p>
+</a>
+
+<style>
+  .project-card {
+    display: block;
+    padding: 1.5rem;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .project-card:hover {
+    transform: scale(1.02);
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .icon {
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: var(--color-secondary);
+    line-height: 1.5;
+  }
+</style>
