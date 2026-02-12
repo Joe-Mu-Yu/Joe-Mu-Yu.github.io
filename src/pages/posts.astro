@@ -3,22 +3,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 
 // 文章数据
-const posts = [
-  {
-    title: '提示词工程学习笔记',
-    description: '系统性整理提示词工程的核心概念、模型选型、编写规范及上下文管理策略',
-    date: new Date('2026-02-11'),
-    tags: ['AI', '提示词工程', '学习笔记'],
-    href: '/posts/prompt-engineering-notes'
-  },
-  {
-    title: '我的第一篇博客',
-    description: '欢迎来到我的个人博客，这里将分享我的技术心得、生活感悟和项目经验。',
-    date: new Date(),
-    tags: ['随笔'],
-    href: '#'
-  }
-];
+// 获取所有文章
+const allPosts = await Astro.glob('./posts/*.md');
+
+// 格式化并排序文章数据
+const posts = allPosts
+  .sort((a, b) => new Date(b.frontmatter.date).valueOf() - new Date(a.frontmatter.date).valueOf())
+  .map(post => ({
+    title: post.frontmatter.title,
+    description: post.frontmatter.description,
+    date: new Date(post.frontmatter.date),
+    tags: post.frontmatter.tags,
+    href: post.url
+  }));
 ---
 
 <BaseLayout title="Posts - Morgan">
