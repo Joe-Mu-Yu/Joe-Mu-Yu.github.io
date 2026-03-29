@@ -2,16 +2,83 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 
-// 示例项目数据 - 请替换为你自己的项目
-const projects = [
+// 从 GitHub API 获取项目数据
+const GITHUB_USERNAME = 'Joe-Mu-Yu';
+const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=50`;
+
+// 手动补充的项目（如果 API 获取失败或需要额外项目）
+const manualProjects = [
   {
-    title: '我的第一个项目',
-    description: '这里展示你的开源项目或个人作品',
-    href: '#',
-    icon: '🚀'
+    title: 'Joe-Mu-Yu.github.io',
+    description: '个人博客网站，采用 Astro 构建，白色透明毛玻璃设计风格',
+    href: 'https://github.com/Joe-Mu-Yu/Joe-Mu-Yu.github.io',
+    icon: '🌐',
+    language: 'TypeScript',
+    stars: 0,
+    forks: 0
   }
-  // 添加更多项目...
 ];
+
+// 获取 GitHub 仓库数据
+async function fetchGitHubRepos() {
+  try {
+    const response = await fetch(GITHUB_API);
+    if (!response.ok) throw new Error('Failed to fetch GitHub repos');
+    const repos = await response.json();
+    
+    // 过滤掉 fork 的项目，只显示原创项目
+    const originalRepos = repos.filter(repo => !repo.fork);
+    
+    const githubProjects = originalRepos.map(repo => ({
+      title: repo.name,
+      description: repo.description || '暂无描述',
+      href: repo.html_url,
+      language: repo.language,
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      updatedAt: new Date(repo.updated_at).toLocaleDateString('zh-CN'),
+      icon: getRepoIcon(repo.name)
+    }));
+    
+    // 合并手动项目（排除重复）
+    const existingTitles = new Set(githubProjects.map(p => p.title));
+    const additionalProjects = manualProjects.filter(p => !existingTitles.has(p.title));
+    
+    return [...githubProjects, ...additionalProjects];
+  } catch (error) {
+    console.error('Error fetching GitHub repos:', error);
+    // 如果 API 失败，返回手动项目
+    return manualProjects;
+  }
+}
+
+// 根据项目名获取图标 emoji
+function getRepoIcon(repoName: string): string {
+  const iconMap: Record<string, string> = {
+    'OpenIsle': '🏝️',
+    'weekly': '📰',
+    'pythermalcomfort': '🌡️',
+    'Learn_Prompting': '📚',
+    'blog': '📝',
+    'website': '🌐',
+    'app': '📱',
+    'tool': '🔧',
+    'ai': '🤖',
+    'web': '🕸️'
+  };
+  
+  // 查找匹配的图标
+  for (const [key, icon] of Object.entries(iconMap)) {
+    if (repoName.toLowerCase().includes(key.toLowerCase())) {
+      return icon;
+    }
+  }
+  
+  // 默认图标
+  return '🚀';
+}
+
+const projects = await fetchGitHubRepos();
 ---
 
 <BaseLayout title="Projects - Morgan">

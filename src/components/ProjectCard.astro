@@ -4,9 +4,13 @@ interface Props {
   description: string;
   href: string;
   icon?: string;
+  language?: string;
+  stars?: number;
+  forks?: number;
+  updatedAt?: string;
 }
 
-const { title, description, href, icon } = Astro.props;
+const { title, description, href, icon, language, stars = 0, forks = 0, updatedAt } = Astro.props;
 ---
 
 <a href={href} class="project-card" target="_blank" rel="noopener noreferrer">
@@ -15,6 +19,23 @@ const { title, description, href, icon } = Astro.props;
     <h3>{title}</h3>
   </div>
   <p>{description}</p>
+  <div class="meta">
+    {language && <span class="language">
+      <span class="language-dot"></span>
+      {language}
+    </span>}
+    <div class="stats">
+      {stars > 0 && <span class="stat" title="Stars">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        {stars}
+      </span>}
+      {forks > 0 && <span class="stat" title="Forks">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="18" cy="6" r="3"></circle><path d="M6 21V9a9 9 0 0 0 6 3"></path><path d="M18 9a9 9 0 0 0-6-3"></path></svg>
+        {forks}
+      </span>}
+    </div>
+  </div>
+  {updatedAt && <time class="updated">Updated {updatedAt}</time>}
 </a>
 
 <style>
@@ -88,5 +109,59 @@ const { title, description, href, icon } = Astro.props;
     font-size: 0.875rem;
     color: var(--color-text-secondary);
     line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--color-border-light);
+  }
+  
+  .language {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+  }
+  
+  .language-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    display: inline-block;
+  }
+  
+  .stats {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  
+  .stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+  }
+  
+  .stat svg {
+    opacity: 0.7;
+  }
+  
+  .updated {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    text-align: right;
   }
 </style>
