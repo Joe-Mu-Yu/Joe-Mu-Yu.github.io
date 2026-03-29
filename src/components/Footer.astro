@@ -1,5 +1,7 @@
 ---
 const today = new Date();
+const startDate = new Date('2024-01-01'); // 博客开始运行日期
+const daysRunning = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 ---
 
 <footer>
@@ -9,7 +11,7 @@ const today = new Date();
       <span class="separator">|</span>
       <a href="/rss.xml">RSS</a>
     </p>
-    <p class="runtime">已运行 1 天</p>
+    <p class="runtime">已运行 {daysRunning} 天</p>
   </div>
 </footer>
 
