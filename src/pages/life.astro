@@ -17,30 +17,36 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <style>
   .section {
-    padding: 4rem 1rem;
-    max-width: 900px;
+    padding: 5rem 1rem 4rem;
+    max-width: var(--max-width-narrow);
+    margin: 0 auto;
   }
   
   h1 {
     font-size: 2.5rem;
     margin-bottom: 2rem;
-    color: var(--color-primary);
+    color: var(--color-text);
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
 
   .content {
-    font-size: 1.1rem;
-    color: var(--color-secondary);
+    font-size: 1rem;
+    color: var(--color-text-secondary);
     line-height: 1.8;
   }
 
   .life-posts {
-    margin-top: 3rem;
+    margin-top: 2.5rem;
   }
 
   .placeholder {
     text-align: center;
-    padding: 3rem 1rem;
-    color: var(--color-secondary);
+    padding: 3rem 1.5rem;
+    color: var(--color-text-tertiary);
     font-style: italic;
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
   }
 </style>

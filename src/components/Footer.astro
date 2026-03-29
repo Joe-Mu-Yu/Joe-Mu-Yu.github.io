@@ -15,21 +15,47 @@ const today = new Date();
 
 <style>
   footer {
-    padding: 3rem 0;
-    margin-top: 4rem;
+    padding: 3rem 0 2rem;
+    margin-top: 6rem;
     text-align: center;
-    color: var(--color-secondary);
-    font-size: 0.9rem;
+    border-top: 1px solid var(--color-border-light);
+  }
+  
+  .container {
+    padding: 1.5rem;
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+  
+  p {
+    font-size: 0.875rem;
+    color: var(--color-text-tertiary);
+    line-height: 1.6;
+  }
+  
+  a {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  a:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    text-decoration: none;
   }
   
   .separator {
     margin: 0 0.5rem;
-    opacity: 0.5;
+    opacity: 0.3;
   }
   
   .runtime {
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
-    opacity: 0.8;
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--color-text-tertiary);
+    display: inline-block;
   }
 </style>

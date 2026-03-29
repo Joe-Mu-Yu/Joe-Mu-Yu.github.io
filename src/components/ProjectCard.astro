@@ -21,39 +21,72 @@ const { title, description, href, icon } = Astro.props;
   .project-card {
     display: block;
     padding: 1.5rem;
-    background-color: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border-radius: var(--border-radius);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
+    box-shadow: var(--shadow-glass);
+    border: 1px solid var(--glass-border);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
   .project-card:hover {
-    transform: scale(1.02);
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    background: var(--glass-bg-strong);
+    border-color: var(--color-border);
+  }
+  
+  .project-card:hover::before {
+    opacity: 1;
   }
 
   .header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.625rem;
     margin-bottom: 0.75rem;
   }
 
   .icon {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+  }
+  
+  .project-card:hover .icon {
+    transform: scale(1.1);
   }
 
   h3 {
-    font-size: 1.1rem;
+    font-size: 1.0625rem;
     font-weight: 600;
+    color: var(--color-text);
+    transition: color 0.2s ease;
+    letter-spacing: -0.01em;
+  }
+  
+  .project-card:hover h3 {
     color: var(--color-primary);
   }
 
   p {
-    font-size: 0.9rem;
-    color: var(--color-secondary);
-    line-height: 1.5;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>
