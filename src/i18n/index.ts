@@ -15,9 +15,11 @@ export const translations = {
             bio: '编程爱好者 / AI爱好者 / 探索生活的美好',
             articles: '文章',
             projectsTitle: '项目',
+            lifeTitle: '生活',
             viewAll: '查看全部',
             viewAllPosts: '查看所有文章',
             viewAllProjects: '查看所有项目',
+            viewAllLife: '查看全部生活',
         },
         // 分类
         categories: {
@@ -67,9 +69,11 @@ export const translations = {
             bio: 'Programming Enthusiast / AI Lover / Exploring the Beauty of Life',
             articles: 'Articles',
             projectsTitle: 'Projects',
+            lifeTitle: 'Life',
             viewAll: 'View All',
             viewAllPosts: 'View All Posts',
             viewAllProjects: 'View All Projects',
+            viewAllLife: 'View All Life',
         },
         // Categories
         categories: {

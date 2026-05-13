@@ -7,11 +7,11 @@
 
 🌐 **在线访问**: [https://joe-mu-yu.github.io](https://joe-mu-yu.github.io)
 
-一个基于 Astro 构建的现代化个人博客，采用白色透明毛玻璃设计风格，支持中英双语和明暗主题切换。
+一个基于 Astro 构建的现代化个人博客，采用**苹果液态玻璃 (Apple Liquid Glass)** 设计风格，支持中英双语和明暗主题切换。
 
 ## ✨ 特性
 
-- 🎨 **现代设计** - 白色透明毛玻璃风格，参考 Google Material Design 3.0
+- 🎨 **现代设计** - 苹果液态玻璃风格 (iOS 26 / visionOS / macOS 16)
 - 🌗 **主题切换** - 支持亮色/暗色模式，自动跟随系统偏好
 - 🌍 **多语言支持** - 中英文国际化，可实时切换
 - 📱 **响应式布局** - 完美适配移动端、平板和桌面端
@@ -20,12 +20,13 @@
 - 📝 **Markdown 支持** - 使用 MDX 编写技术文章
 - 🎯 **GitHub 集成** - 自动同步 GitHub 仓库到项目页面
 - ♿ **无障碍访问** - 符合 WAI-ARIA 标准
+- 💎 **液态玻璃** - 8% 透明度 + blur(40px) saturate(180%) + 三层阴影
 
 ## 🛠️ 技术栈
 
 - **框架**: [Astro 5.0](https://astro.build/)
 - **语言**: TypeScript
-- **样式**: CSS Variables + 毛玻璃效果
+- **样式**: CSS Variables + Apple Liquid Glass (backdrop-filter + 多层阴影)
 - **部署**: GitHub Pages
 - **内容**: MDX (Markdown + JSX)
 
@@ -180,12 +181,22 @@ const manualProjects = [
 
 ## 🌟 设计亮点
 
-### 白色透明毛玻璃风格
+### 🍎 苹果液态玻璃风格 (Apple Liquid Glass)
 
-- **玻璃态组件**: 使用 `backdrop-filter: blur(20px)` 创建毛玻璃效果
-- **透明层次**: 70% / 50% / 85% 三种透明度层级
-- **微妙阴影**: 精确计算的阴影值，营造空间感
-- **渐变背景**: 径向渐变光晕，增加视觉深度
+- **液态玻璃组件**: 使用 `backdrop-filter: blur(40px) saturate(180%)` 创建真实液态玻璃效果
+- **透明层次**: 8% / 4% / 12% 三种动态透明度层级
+- **三层阴影**: 外层 + 中层 + 内发光，营造立体悬浮感
+- **边缘光效果**: 20% 透明度边框模拟光线折射
+- **液态光泽层**: 135 度渐变光泽，模拟光线流动
+- **渐变背景**: 多层径向渐变光晕，增加视觉深度
+- **大圆角设计**: 36px 超大圆角，现代柔和
+- **性能优化**: 硬件加速 + 移动端降级 + 减少动画偏好支持
+
+**📚 设计文档**:
+- [REDESIGN-QUICKSTART.md](./REDESIGN-QUICKSTART.md) - 快速预览指南
+- [LIQUID-GLASS-REDESIGN-REPORT.md](./LIQUID-GLASS-REDESIGN-REPORT.md) - 实施报告
+- [REDESIGN-PROPOSAL.md](./REDESIGN-PROPOSAL.md) - 设计方案
+- [LIQUID-GLASS-GUIDE.md](./LIQUID-GLASS-GUIDE.md) - 设计指南
 
 ### 交互体验
 

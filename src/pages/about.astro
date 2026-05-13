@@ -67,13 +67,20 @@ import InteractiveMap from '../components/InteractiveMap.astro';
   ul li {
     padding: 0.75rem 1rem;
     margin: 0.5rem 0;
-    background: var(--color-bg-secondary);
-    border-radius: var(--border-radius-sm);
+    
+    /* 液态玻璃效果 */
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
     transition: all 0.2s ease;
   }
   
   ul li:hover {
-    background: var(--color-bg-tertiary);
+    background: var(--glass-bg-strong);
+    transform: translateX(4px);
+    border-color: rgba(255, 255, 255, 0.25);
   }
 
   a {

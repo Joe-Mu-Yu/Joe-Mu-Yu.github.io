@@ -3,6 +3,7 @@ title: "提示词工程学习笔记"
 description: "系统性整理提示词工程的核心概念、模型选型、编写规范及上下文管理策略"
 date: 2026-02-11
 tags: ["AI", "提示词工程", "学习笔记"]
+layout: ../../layouts/PostLayout.astro
 ---
 
 # 提示词工程学习笔记

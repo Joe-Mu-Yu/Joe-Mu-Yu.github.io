@@ -37,9 +37,11 @@ const formattedDate = date.toLocaleDateString('zh-CN', {
 
 <style>
   .article-card {
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* 液态玻璃效果 - Apple Liquid Glass */
     background: var(--glass-bg);
     backdrop-filter: var(--backdrop-blur);
     -webkit-backdrop-filter: var(--backdrop-blur);
@@ -48,11 +50,32 @@ const formattedDate = date.toLocaleDateString('zh-CN', {
     position: relative;
   }
 
+  .article-card::after {
+    /* 液态光泽层 */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.03) 45%,
+      rgba(255, 255, 255, 0.08) 55%,
+      rgba(255, 255, 255, 0.15) 100%
+    );
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
   .article-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-hover);
     background: var(--glass-bg-strong);
-    border-color: var(--color-border);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  
+  .article-card:hover::after {
+    opacity: 0.7;
   }
 
   .card-link {

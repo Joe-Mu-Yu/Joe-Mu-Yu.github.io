@@ -19,16 +19,76 @@ const posts = allPosts
     href: post.url
   }));
 
-// 示例项目数据 - 请替换为你自己的项目
-const projects = [
+// 从 GitHub API 获取项目数据（与项目页同步）
+const GITHUB_USERNAME = 'Joe-Mu-Yu';
+const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=50`;
+
+const manualProjects = [
   {
-    title: '我的第一个项目',
-    description: '这里展示你的开源项目或个人作品',
-    href: '#',
-    icon: '🚀'
+    title: 'Joe-Mu-Yu.github.io',
+    description: '个人博客网站，采用 Astro 构建，白色透明毛玻璃设计风格',
+    href: 'https://github.com/Joe-Mu-Yu/Joe-Mu-Yu.github.io',
+    icon: '🌐',
+    language: 'TypeScript',
+    stars: 0,
+    forks: 0
   }
-  // 添加更多项目...
 ];
+
+async function fetchGitHubRepos() {
+  try {
+    const response = await fetch(GITHUB_API);
+    if (!response.ok) throw new Error('Failed to fetch GitHub repos');
+    const repos = await response.json();
+    
+    const originalRepos = repos.filter(repo => !repo.fork);
+    
+    const githubProjects = originalRepos.map(repo => ({
+      title: repo.name,
+      description: repo.description || '暂无描述',
+      href: repo.html_url,
+      language: repo.language,
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      updatedAt: new Date(repo.updated_at).toLocaleDateString('zh-CN'),
+      icon: getRepoIcon(repo.name)
+    }));
+    
+    const existingTitles = new Set(githubProjects.map(p => p.title));
+    const additionalProjects = manualProjects.filter(p => !existingTitles.has(p.title));
+    
+    return [...githubProjects, ...additionalProjects];
+  } catch (error) {
+    console.error('Error fetching GitHub repos:', error);
+    return manualProjects;
+  }
+}
+
+function getRepoIcon(repoName: string): string {
+  const iconMap: Record<string, string> = {
+    'OpenIsle': '🏝️',
+    'weekly': '📰',
+    'pythermalcomfort': '🌡️',
+    'Learn_Prompting': '📚',
+    'blog': '📝',
+    'website': '🌐',
+    'app': '📱',
+    'tool': '🔧',
+    'ai': '🤖',
+    'web': '🕸️'
+  };
+  
+  for (const [key, icon] of Object.entries(iconMap)) {
+    if (repoName.toLowerCase().includes(key.toLowerCase())) {
+      return icon;
+    }
+  }
+  
+  return '🚀';
+}
+
+const allProjects = await fetchGitHubRepos();
+const projects = allProjects.slice(0, 3);
 
 const categories = ['前端', '项目', '工具', '生活'];
 ---
@@ -85,6 +145,23 @@ const categories = ['前端', '项目', '工具', '生活'];
       <Button href="/projects" variant="secondary"><span data-i18n="home.viewAllProjects">查看所有项目</span></Button>
     </div>
   </section>
+
+  <section class="section container">
+    <div class="section-header">
+      <h2 data-i18n="home.lifeTitle">生活</h2>
+    </div>
+    
+    <div class="life-content">
+      <p class="life-description">分享生活中的点滴瞬间和感悟</p>
+      <div class="life-placeholder">
+        <p>生活相关的文章将显示在这里...</p>
+      </div>
+    </div>
+    
+    <div class="view-more">
+      <Button href="/life" variant="secondary"><span data-i18n="home.viewAllLife">查看全部生活</span></Button>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
@@ -99,6 +176,15 @@ const categories = ['前端', '项目', '工具', '生活'];
     gap: 4rem;
     max-width: 960px;
     margin: 0 auto;
+    
+    /* 液态玻璃容器 */
+    background: var(--glass-bg-light);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border-radius: var(--border-radius-lg);
+    padding: 3rem;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
   }
 
   .hero-text {
@@ -116,9 +202,9 @@ const categories = ['前端', '项目', '工具', '生活'];
     height: 200px;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-glass);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 4px solid var(--color-bg);
+    border: 4px solid var(--glass-border);
   }
 
   .hero-avatar img:hover {
@@ -182,6 +268,34 @@ const categories = ['前端', '项目', '工具', '生活'];
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.25rem;
+  }
+
+  .life-content {
+    /* 液态玻璃效果 */
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .life-description {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+  }
+
+  .life-placeholder {
+    padding: 3rem 1.5rem;
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    background: var(--glass-bg-light);
+    border-radius: var(--border-radius-lg);
+    border: 1px dashed var(--glass-border);
   }
 
   .view-more {

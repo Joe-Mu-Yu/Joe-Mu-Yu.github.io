@@ -1,0 +1,308 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import CategoryTag from '../components/CategoryTag.astro';
+import PostNavigation from '../components/PostNavigation.astro';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description?: string;
+    date: string;
+    tags?: string[];
+    layout?: string;
+  };
+}
+
+const { frontmatter } = Astro.props;
+
+const { title, description, date, tags = [] } = frontmatter;
+
+const formattedDate = new Date(date).toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+// 获取所有文章用于导航
+const allPosts = await Astro.glob('../pages/posts/*.md');
+const sortedPosts = allPosts
+  .sort((a, b) => new Date(b.frontmatter.date).valueOf() - new Date(a.frontmatter.date).valueOf());
+
+const currentIndex = sortedPosts.findIndex(
+  post => post.frontmatter.title === title
+);
+
+const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+---
+
+<BaseLayout title={`${title} - Morgan`} description={description}>
+  <article class="post-page">
+    <!-- 文章头部 - 液态玻璃效果 -->
+    <header class="post-header glass-post-header">
+      <div class="header-edge-light"></div>
+      <div class="post-header-inner">
+        <div class="post-meta-top">
+          <time datetime={date} class="post-date">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            {formattedDate}
+          </time>
+          {tags.length > 0 && (
+            <div class="post-tags">
+              {tags.map(tag => <CategoryTag tag={tag} />)}
+            </div>
+          )}
+        </div>
+        <h1 class="post-title">{title}</h1>
+        {description && <p class="post-description">{description}</p>}
+      </div>
+    </header>
+
+    <!-- 文章内容 - 液态玻璃效果 -->
+    <div class="post-content glass-post-content">
+      <div class="content-edge-light"></div>
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+
+    <!-- 文章导航 -->
+    <PostNavigation prevPost={prevPost ? { title: prevPost.frontmatter.title, href: prevPost.url || '' } : null} nextPost={nextPost ? { title: nextPost.frontmatter.title, href: nextPost.url || '' } : null} />
+  </article>
+
+  <!-- 返回顶部按钮 -->
+  <button class="back-to-top glass-btn" id="backToTop" aria-label="返回顶部">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+</BaseLayout>
+
+<style>
+  .post-page {
+    max-width: var(--max-width-narrow);
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* ===== 文章头部 - 液态玻璃 ===== */
+  .post-header {
+    position: relative;
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--backdrop-blur-strong);
+    -webkit-backdrop-filter: var(--backdrop-blur-strong);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    border-radius: var(--border-radius-lg);
+    padding: 3rem 2.5rem;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .header-edge-light {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.5) 30%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0.5) 70%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* 液态光泽层 */
+  .post-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.03) 40%,
+      rgba(255, 255, 255, 0.06) 60%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
+    opacity: 0.6;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  .post-header-inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .post-meta-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .post-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+  }
+
+  .post-date svg {
+    opacity: 0.6;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .post-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-text);
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+  }
+
+  .post-description {
+    font-size: 1.0625rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    max-width: 600px;
+  }
+
+  /* ===== 文章内容区 - 液态玻璃 ===== */
+  .post-content {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    border-radius: var(--border-radius-lg);
+    padding: 2.5rem;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .content-edge-light {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* ===== 返回顶部按钮 ===== */
+  .back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    border: none;
+    color: var(--color-text-secondary);
+  }
+
+  .back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .back-to-top:hover {
+    color: var(--color-text);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 768px) {
+    .post-page {
+      padding: 1rem 0.75rem 3rem;
+    }
+
+    .post-header {
+      padding: 2rem 1.5rem;
+      border-radius: var(--border-radius);
+    }
+
+    .post-title {
+      font-size: 1.75rem;
+    }
+
+    .post-content {
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+    }
+
+    .post-meta-top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .back-to-top {
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 40px;
+      height: 40px;
+    }
+  }
+</style>
+
+<script>
+  // 返回顶部按钮逻辑
+  const backToTop = document.getElementById('backToTop');
+
+  if (backToTop) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+    }, { passive: true });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+</script>
+
+<script src="../scripts/scroll-effects.js"></script>

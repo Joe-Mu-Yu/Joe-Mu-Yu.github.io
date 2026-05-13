@@ -1,65 +1,109 @@
 :root {
-    --color-bg: #ffffff;
-    --color-bg-secondary: #f8f9fa;
-    --color-bg-tertiary: #f1f3f4;
-    --color-text: #1a1a1a;
-    --color-text-secondary: #5f6368;
-    --color-text-tertiary: #80868b;
-    --color-primary: #1a73e8;
-    --color-primary-hover: #1557b0;
-    --color-primary-light: rgba(26, 115, 232, 0.08);
-    --color-accent: #ea4335;
-    --color-border: rgba(0, 0, 0, 0.08);
-    --color-border-light: rgba(0, 0, 0, 0.04);
+    /* 亮色主题 - 苹果液态玻璃风格 */
+    --color-bg: #f5f5f7;              /* 苹果浅灰色背景 */
+    --color-bg-secondary: #ffffff;    /* 白色卡片背景 */
+    --color-bg-tertiary: #e8e8ed;     /* 第三层浅色 */
     
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-bg-light: rgba(255, 255, 255, 0.5);
-    --glass-bg-strong: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.18);
+    /* 深色文本确保高对比度 */
+    --color-text: #1d1d1f;            /* 苹果深灰色文本 */
+    --color-text-secondary: #424245;  /* 次级文本 */
+    --color-text-tertiary: #86868b;   /* 辅助文本 */
     
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03);
-    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
-    --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.1), 0 6px 24px rgba(0, 0, 0, 0.06);
-    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
-    --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.06);
+    /* 主色调 - 苹果蓝色 */
+    --color-primary: #0071e3;         /* 苹果蓝色 */
+    --color-primary-hover: #0077ed;
+    --color-primary-light: rgba(0, 113, 227, 0.1);
+    --color-accent: #0071e3;          /* 苹果蓝色强调色 */
     
-    --backdrop-blur: blur(20px);
-    --backdrop-blur-strong: blur(40px);
+    /* 边框颜色 - 深色半透明 */
+    --color-border: rgba(0, 0, 0, 0.12);
+    --color-border-light: rgba(0, 0, 0, 0.06);
     
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* 液态玻璃效果 - Apple Liquid Glass 风格（亮色模式） */
+    --glass-bg: rgba(255, 255, 255, 0.65);        /* 65% 白色背景 - 轻盈玻璃 */
+    --glass-bg-light: rgba(255, 255, 255, 0.45);   /* 45% 轻透明度 */
+    --glass-bg-strong: rgba(255, 255, 255, 0.80);  /* 80% 强透明度 */
+    --glass-border: rgba(255, 255, 255, 0.4);      /* 40% 边框 - 边缘光效果 */
+    
+    /* 阴影 - 性能优化版（减少层数） */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.18);
+    --shadow-glass: 0 8px 24px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    
+    /* 液态玻璃滤镜 - 性能优化版 */
+    --backdrop-blur: blur(20px) saturate(150%);    /* 降低模糊半径 */
+    --backdrop-blur-strong: blur(30px) saturate(160%);
+    --backdrop-brightness: brightness(1.02);       /* 轻微增亮 */
+    
+    /* 液态光效果 - 渐变光泽（亮色模式） */
+    --liquid-gradient: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0.6) 100%
+    );
+    
+    /* 边缘光效果（亮色模式） */
+    --edge-light: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0.7) 100%
+    );
+    
+    /* 背景渐变 - 亮色模式 */
+    --bg-gradient: 
+        radial-gradient(circle at 20% 50%, rgba(0, 113, 227, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 80% 20%, rgba(0, 113, 227, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(175, 82, 222, 0.05) 0%, transparent 50%);
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --max-width: 1120px;
     --max-width-narrow: 720px;
     --border-radius: 20px;
     --border-radius-sm: 12px;
-    --border-radius-lg: 28px;
+    --border-radius-lg: 36px;  /* 大圆角设计 */
 }
 
 [data-theme='dark'] {
-    --color-bg: #0f0f0f;
-    --color-bg-secondary: #1a1a1a;
-    --color-bg-tertiary: #242526;
-    --color-text: #f1f3f4;
-    --color-text-secondary: #babcbe;
-    --color-text-tertiary: #80868b;
-    --color-primary: #8ab4f8;
-    --color-primary-hover: #aecbfa;
-    --color-primary-light: rgba(138, 180, 248, 0.12);
-    --color-accent: #f28b82;
-    --color-border: rgba(255, 255, 255, 0.08);
-    --color-border-light: rgba(255, 255, 255, 0.04);
+    /* 暗色主题 - 苹果液态玻璃风格 */
+    --color-bg: #0a0a0a;              /* 深灰黑色背景 - 非纯黑 */
+    --color-bg-secondary: #141414;    /* 稍深的背景 */
+    --color-bg-tertiary: #1c1c1d;     /* 第三层深色 */
     
-    --glass-bg: rgba(30, 30, 30, 0.7);
-    --glass-bg-light: rgba(30, 30, 30, 0.5);
-    --glass-bg-strong: rgba(30, 30, 30, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    /* 白色文本 */
+    --color-text: #f5f5f7;            /* 浅色文本 */
+    --color-text-secondary: #d2d2d7;  /* 次级文本 */
+    --color-text-tertiary: #86868b;   /* 辅助文本 */
     
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2);
-    --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.5), 0 6px 24px rgba(0, 0, 0, 0.3);
-    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
-    --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.3);
+    /* 主色调 - 纯白色 + 苹果蓝 */
+    --color-primary: #0a84ff;         /* 苹果蓝色（暗色模式专用） */
+    --color-primary-hover: #409cff;
+    --color-primary-light: rgba(10, 132, 255, 0.15);
+    --color-accent: #0a84ff;
+    
+    /* 边框颜色 */
+    --color-border: rgba(255, 255, 255, 0.15);
+    --color-border-light: rgba(255, 255, 255, 0.08);
+    
+    /* 液态玻璃效果 - 暗色模式 */
+    --glass-bg: rgba(30, 30, 30, 0.65);        /* 65% 深色玻璃 */
+    --glass-bg-light: rgba(30, 30, 30, 0.45);   /* 45% 轻透明度 */
+    --glass-bg-strong: rgba(30, 30, 30, 0.80);  /* 80% 强透明度 */
+    --glass-border: rgba(255, 255, 255, 0.2);   /* 20% 边框 - 边缘光 */
+    
+    /* 阴影 - 暗色模式 */
+    --shadow-glass: 0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --shadow-hover: 0 24px 48px rgba(0, 0, 0, 0.5), 0 12px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    
+    /* 背景渐变 - 暗色模式 */
+    --bg-gradient: 
+        radial-gradient(circle at 20% 50%, rgba(10, 132, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 80% 20%, rgba(10, 132, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(175, 82, 222, 0.08) 0%, transparent 50%);
 }
 
 * {
@@ -68,19 +112,92 @@
     padding: 0;
 }
 
+/* 全局过渡动画 - 主题切换平滑 */
+:root {
+    --theme-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 主题切换时的过渡效果 */
+html {
+    transition: var(--theme-transition);
+}
+
 body {
     background-color: var(--color-bg);
-    background-image: 
-        radial-gradient(circle at 20% 50%, var(--color-primary-light) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, var(--color-primary-light) 0%, transparent 40%);
+    /* 多层渐变背景 - 营造深度感（使用 CSS 变量） */
+    background-image: var(--bg-gradient);
     background-attachment: fixed;
     color: var(--color-text);
     font-family: var(--font-sans);
     line-height: 1.6;
-    transition: all 0.3s ease;
+    transition: var(--theme-transition);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* 液态玻璃效果通用类 - Apple Liquid Glass 风格 */
+.glass {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+
+/* 液态玻璃内发光效果 */
+.glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.08) 0%,
+        transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.glass:hover::before {
+    opacity: 1;
+}
+
+.glass-strong {
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--backdrop-blur-strong);
+    -webkit-backdrop-filter: var(--backdrop-blur-strong);
+}
+
+/* 所有带边框的元素应用统一液态玻璃效果 */
+article,
+.card,
+.panel,
+.content-box {
+    position: relative;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 悬停时的液态光效果 */
+article:hover,
+.card:hover,
+.panel:hover,
+.content-box:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
 a {
@@ -96,4 +213,705 @@ ul {
     max-width: var(--max-width);
     margin: 0 auto;
     padding: 0 1rem;
+}
+
+/* ============================================
+   液态玻璃高级效果 - Apple Liquid Glass 风格
+   ============================================ */
+
+/* 液态玻璃卡片 - 增强版 */
+.liquid-glass {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+
+/* 液态光泽层 */
+.liquid-glass::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.03) 45%,
+        rgba(255, 255, 255, 0.08) 55%,
+        rgba(255, 255, 255, 0.15) 100%
+    );
+    opacity: 0.5;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+/* 边缘高光效果 */
+.liquid-glass .edge-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+}
+
+/* 色散效果 - Chromatic Aberration */
+.liquid-chromatic {
+    position: relative;
+}
+
+.liquid-chromatic::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 0, 100, 0.03) 0%,
+        transparent 50%,
+        rgba(0, 150, 255, 0.03) 100%
+    );
+    border-radius: inherit;
+    z-index: -1;
+    filter: blur(8px);
+}
+
+/* 动态液态波纹效果 */
+.liquid-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.liquid-ripple::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.06) 0%,
+        transparent 60%
+    );
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+}
+
+.liquid-ripple:hover::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 性能优化 - 硬件加速 */
+.glass,
+.liquid-glass,
+article,
+.card,
+.panel,
+.content-box,
+.article-card,
+.project-card,
+.header-inner {
+    will-change: transform, box-shadow, background;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* 响应式优化 - 移动端降低效果强度 */
+@media (max-width: 768px) {
+    :root {
+        --backdrop-blur: blur(30px) saturate(160%);
+        --backdrop-blur-strong: blur(45px) saturate(180%);
+        --border-radius-lg: 28px;
+    }
+    
+    .liquid-glass::after,
+    .article-card::after,
+    .project-card::after {
+        opacity: 0.3;
+    }
+}
+
+/* 减少动画对性能的影响 */
+@media (prefers-reduced-motion: reduce) {
+    .glass::before,
+    .liquid-ripple::before,
+    .article-card::after,
+    .project-card::after {
+        transition: none;
+    }
+    
+    .liquid-ripple:hover::before {
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   高级液态玻璃效果 - Apple Liquid Glass 风格
+   ============================================ */
+
+/* 边缘高光效果 - 用于卡片顶部 */
+.edge-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* 动态波纹效果 - 悬停时从中心扩散 */
+.liquid-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.liquid-ripple::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.06) 0%,
+        transparent 60%
+    );
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.liquid-ripple:hover::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 色散效果 - 模拟真实玻璃的 RGB 色彩分裂 */
+.liquid-chromatic {
+    position: relative;
+}
+
+.liquid-chromatic::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 0, 100, 0.03) 0%,    /* 红色偏移 */
+        transparent 50%,
+        rgba(0, 150, 255, 0.03) 100%   /* 蓝色偏移 */
+    );
+    border-radius: inherit;
+    z-index: -1;
+    filter: blur(8px);
+}
+
+/* 液态玻璃按钮效果 */
+.btn-liquid {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-liquid::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.12) 0%,
+        rgba(255, 255, 255, 0.03) 45%,
+        rgba(255, 255, 255, 0.08) 55%,
+        rgba(255, 255, 255, 0.15) 100%
+    );
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+}
+
+.btn-liquid:hover {
+    background: var(--glass-bg-strong);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+.btn-liquid:hover::after {
+    opacity: 0.7;
+}
+
+/* 响应式优化 - 移动端降低效果强度 */
+@media (max-width: 768px) {
+    .liquid-glass::after,
+    .article-card::after,
+    .project-card::after {
+        opacity: 0.3;
+    }
+    
+    .liquid-ripple::before {
+        transition: none;
+    }
+}
+
+/* ============================================
+   文章详情页专用液态玻璃类
+   ============================================ */
+
+/* 文章头部 - 强玻璃 */
+.glass-post-header {
+    position: relative;
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--backdrop-blur-strong);
+    -webkit-backdrop-filter: var(--backdrop-blur-strong);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 文章内容区 - 中等玻璃 */
+.glass-post-content {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 导航卡片 - 轻玻璃 */
+.glass-nav-card {
+    position: relative;
+    background: var(--glass-bg-light);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-nav-card:hover {
+    background: var(--glass-bg);
+    box-shadow: var(--shadow-glass);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* 通用液态玻璃按钮 */
+.glass-btn {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--border-radius);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-btn:hover {
+    background: var(--glass-bg-strong);
+    box-shadow: var(--shadow-glass);
+}
+
+/* ============================================
+   动态背景效果 - 液态光晕（性能优化版）
+   ============================================ */
+
+/* 浮动光斑背景 - 简化为静态 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle 500px at 20% 30%, rgba(0, 113, 227, 0.05) 0%, transparent 100%),
+        radial-gradient(circle 400px at 80% 70%, rgba(175, 82, 222, 0.04) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: -1;
+    /* 移除动画，改用 will-change 优化 */
+    will-change: transform;
+}
+
+/* ============================================
+   Markdown 文章排版样式 (Prose)
+   ============================================ */
+
+.prose {
+    position: relative;
+    z-index: 1;
+    color: var(--color-text);
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    letter-spacing: -0.005em;
+}
+
+.prose > *:first-child {
+    margin-top: 0;
+}
+
+.prose > *:last-child {
+    margin-bottom: 0;
+}
+
+/* 标题 */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+    color: var(--color-text);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin-top: 2.5em;
+    margin-bottom: 0.75em;
+}
+
+.prose h1 { font-size: 1.875rem; }
+.prose h2 {
+    font-size: 1.5rem;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid var(--color-border-light);
+}
+.prose h3 { font-size: 1.25rem; }
+.prose h4 { font-size: 1.125rem; }
+
+/* 段落 */
+.prose p {
+    margin-bottom: 1.25em;
+    color: var(--color-text-secondary);
+}
+
+/* 链接 */
+.prose a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.prose a:hover {
+    background: var(--color-primary-light);
+}
+
+/* 粗体和斜体 */
+.prose strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.prose em {
+    font-style: italic;
+}
+
+/* 列表 */
+.prose ul,
+.prose ol {
+    margin-bottom: 1.25em;
+    padding-left: 1.5em;
+}
+
+.prose ul {
+    list-style: disc;
+}
+
+.prose ol {
+    list-style: decimal;
+}
+
+.prose li {
+    margin-bottom: 0.5em;
+    color: var(--color-text-secondary);
+}
+
+.prose li::marker {
+    color: var(--color-text-tertiary);
+}
+
+/* 引用块 - 液态玻璃效果 */
+.prose blockquote {
+    position: relative;
+    margin: 1.5em 0;
+    padding: 1.25em 1.5em;
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-sm);
+    color: var(--color-text-secondary);
+    font-style: italic;
+    overflow: hidden;
+}
+
+.prose blockquote::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(
+        180deg,
+        var(--color-primary) 0%,
+        rgba(175, 82, 222, 0.6) 100%
+    );
+    border-radius: 0 2px 2px 0;
+}
+
+.prose blockquote p {
+    color: var(--color-text-secondary);
+    margin-bottom: 0;
+}
+
+/* 代码 - 行内 */
+.prose code {
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+    font-size: 0.875em;
+    padding: 0.2em 0.45em;
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+/* 代码块 - 液态玻璃效果 */
+.prose pre {
+    position: relative;
+    margin: 1.5em 0;
+    padding: 1.5em;
+    background: var(--glass-bg-strong);
+    backdrop-filter: var(--backdrop-blur-strong);
+    -webkit-backdrop-filter: var(--backdrop-blur-strong);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-glass);
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* 代码块顶部光泽 */
+.prose pre::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+}
+
+.prose pre code {
+    display: block;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    overflow-x: auto;
+}
+
+/* 表格 - 液态玻璃效果 */
+.prose table {
+    width: 100%;
+    margin: 1.5em 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.prose thead {
+    background: var(--glass-bg-strong);
+}
+
+.prose th {
+    padding: 0.75em 1em;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--glass-border);
+    letter-spacing: -0.01em;
+}
+
+.prose td {
+    padding: 0.75em 1em;
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.prose tr:last-child td {
+    border-bottom: none;
+}
+
+.prose tbody tr {
+    transition: background 0.2s ease;
+}
+
+.prose tbody tr:hover {
+    background: var(--glass-bg);
+}
+
+/* 分隔线 */
+.prose hr {
+    margin: 2.5em 0;
+    border: none;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--glass-border) 20%,
+        var(--glass-border) 80%,
+        transparent 100%
+    );
+}
+
+/* 图片 */
+.prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-md);
+    margin: 1.5em 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.prose img:hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 行内代码块容器（如 ```xml ```） */
+.prose pre + .prose-block,
+.prose .prose-block {
+    position: relative;
+}
+
+/* 嵌套列表 */
+.prose ul ul,
+.prose ol ol,
+.prose ul ol,
+.prose ol ul {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+/* ============================================
+   文章详情页响应式优化
+   ============================================ */
+
+@media (max-width: 768px) {
+    .prose {
+        font-size: 1rem;
+        line-height: 1.75;
+    }
+
+    .prose h1 { font-size: 1.5rem; }
+    .prose h2 { font-size: 1.25rem; }
+    .prose h3 { font-size: 1.125rem; }
+
+    .prose pre {
+        padding: 1em;
+        border-radius: var(--border-radius-sm);
+        font-size: 0.8125rem;
+    }
+
+    .prose table {
+        font-size: 0.875rem;
+    }
+
+    .prose th,
+    .prose td {
+        padding: 0.5em 0.75em;
+    }
+
+    .prose blockquote {
+        padding: 1em 1.25em;
+    }
+}
+
+/* ============================================
+   页面过渡动画（性能优化版）
+   ============================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 简化入场动画 - 单次、无延迟 */
+.post-page > * {
+    animation: fadeInUp 0.3s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .post-page > * {
+        animation: none;
+    }
 }

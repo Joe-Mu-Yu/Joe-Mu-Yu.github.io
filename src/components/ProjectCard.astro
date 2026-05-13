@@ -42,10 +42,12 @@ const { title, description, href, icon, language, stars = 0, forks = 0, updatedA
   .project-card {
     display: block;
     padding: 1.5rem;
+    
+    /* 液态玻璃效果 - Apple Liquid Glass */
     background: var(--glass-bg);
     backdrop-filter: var(--backdrop-blur);
     -webkit-backdrop-filter: var(--backdrop-blur);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
     box-shadow: var(--shadow-glass);
@@ -54,7 +56,25 @@ const { title, description, href, icon, language, stars = 0, forks = 0, updatedA
     overflow: hidden;
   }
   
+  .project-card::after {
+    /* 液态光泽层 */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.03) 45%,
+      rgba(255, 255, 255, 0.08) 55%,
+      rgba(255, 255, 255, 0.15) 100%
+    );
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+  
   .project-card::before {
+    /* 顶部渐变条 */
     content: '';
     position: absolute;
     top: 0;
@@ -64,17 +84,22 @@ const { title, description, href, icon, language, stars = 0, forks = 0, updatedA
     background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
     opacity: 0;
     transition: opacity 0.3s ease;
+    z-index: 1;
   }
 
   .project-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-hover);
     background: var(--glass-bg-strong);
-    border-color: var(--color-border);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(255, 255, 255, 0.25);
   }
   
   .project-card:hover::before {
     opacity: 1;
+  }
+  
+  .project-card:hover::after {
+    opacity: 0.7;
   }
 
   .header {

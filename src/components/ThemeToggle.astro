@@ -10,22 +10,24 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-light);
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--color-text-secondary);
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
   }
   
   button:hover {
-    background: var(--color-bg-tertiary);
+    background: var(--glass-bg-strong);
     color: var(--color-text);
-    border-color: var(--color-border);
+    border-color: var(--glass-border);
     transform: scale(1.05);
   }
   
@@ -37,27 +39,79 @@
     width: 18px;
     height: 18px;
     transition: transform 0.3s ease;
+    position: absolute;
   }
   
   button:hover svg {
     transform: rotate(15deg);
   }
   
-  /* Simple logic: hide one icon based on theme */
-  :global([data-theme='dark']) .sun { display: block; }
-  :global([data-theme='dark']) .moon { display: none; }
-  :global(:not([data-theme='dark'])) .sun { display: none; }
-  :global(:not([data-theme='dark'])) .moon { display: block; }
+  /* 主题图标显示逻辑 */
+  .sun {
+    transform: rotate(0deg);
+  }
+  
+  .moon {
+    transform: rotate(0deg);
+  }
+  
+  /* 亮色模式：显示月亮 */
+  :global(:not([data-theme='dark'])) .sun { 
+    display: none; 
+  }
+  :global(:not([data-theme='dark'])) .moon { 
+    display: block; 
+  }
+  
+  /* 暗色模式：显示太阳 */
+  :global([data-theme='dark']) .sun { 
+    display: block; 
+  }
+  :global([data-theme='dark']) .moon { 
+    display: none; 
+  }
 </style>
 
 <script>
   const toggle = document.getElementById('theme-toggle');
   
-  toggle?.addEventListener('click', () => {
+  // 初始化图标状态
+  function updateIcon() {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const newTheme = isDark ? 'light' : 'dark';
+    if (toggle) {
+      toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+  }
+  
+  // 页面加载时更新图标
+  updateIcon();
+  
+  toggle?.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     
+    // 添加过渡动画类
+    document.documentElement.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    
+    // 切换主题
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
+    
+    // 更新图标
+    updateIcon();
+    
+    // 移除过渡样式（避免影响其他动画）
+    setTimeout(() => {
+      document.documentElement.style.transition = '';
+    }, 300);
+  });
+  
+  // 监听系统主题变化
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      const newTheme = e.matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      updateIcon();
+    }
   });
 </script>

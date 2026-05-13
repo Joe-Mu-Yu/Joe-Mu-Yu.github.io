@@ -46,7 +46,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     padding: 3rem 1.5rem;
     color: var(--color-text-tertiary);
     font-style: italic;
-    background: var(--color-bg-secondary);
-    border-radius: var(--border-radius);
+    
+    /* 液态玻璃效果 */
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-glass);
   }
 </style>
