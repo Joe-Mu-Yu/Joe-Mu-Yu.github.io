@@ -4,37 +4,76 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 interface Props {
-	title: string;
-	description?: string;
+    title: string;
+    description?: string;
+    titleKey?: string;
+    descriptionKey?: string;
 }
 
-const { title, description = "Morgan's Personal Blog" } = Astro.props;
+const { title, description = "Morgan's personal blog: writing on code, AI and the parts in between.", titleKey, descriptionKey } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="zh-CN">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<script is:inline>
-			// 立即执行，防止闪烁
-			(function() {
-				const theme = localStorage.getItem('theme');
-				const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-				const isDark = theme === 'dark' || (!theme && prefersDark);
-				document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-			})();
-		</script>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<slot />
-		</main>
-		<Footer />
-	</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" content={description} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="generator" content={Astro.generator} />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <title>{title}</title>
+        <script is:inline>
+            // Runs before first paint so the paper never flashes the wrong tone.
+            (function () {
+                try {
+                    var theme = localStorage.getItem('theme');
+                    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    var isDark = theme === 'dark' || (!theme && prefersDark);
+                    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                    var lang = localStorage.getItem('language');
+                    if (lang === 'en' || lang === 'zh') {
+                        document.documentElement.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+                    }
+                } catch (error) {
+                    // Blocked storage (private mode): keep the rendered default.
+                }
+            })();
+        </script>
+    </head>
+    <body data-i18n-title={titleKey} data-i18n-description={descriptionKey}>
+        <a class="skip-link" href="#main" data-i18n="nav.skipToContent">跳到主要内容</a>
+        <Header />
+        <main id="main">
+            <slot />
+        </main>
+        <Footer />
+
+        <script>
+            import { applyTranslations } from '../i18n/index.ts';
+            import '../scripts/scroll-effects.js';
+
+            applyTranslations();
+            window.addEventListener('languageChanged', () => applyTranslations());
+        </script>
+    </body>
 </html>
+
+<style>
+    .skip-link {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -120%);
+        z-index: 200;
+        background: var(--color-text);
+        color: var(--color-bg);
+        padding: 0.75rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: transform 0.2s var(--ease-snap);
+    }
+
+    .skip-link:focus {
+        transform: translate(-50%, 0);
+    }
+</style>

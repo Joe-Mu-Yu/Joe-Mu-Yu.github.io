@@ -1,149 +1,359 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
 import LanguageToggle from './LanguageToggle.astro';
+
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+
+const links = [
+    { href: '/', key: 'nav.home', label: '首页' },
+    { href: '/posts', key: 'nav.posts', label: '文章' },
+    { href: '/projects', key: 'nav.projects', label: '项目' },
+    { href: '/life', key: 'nav.life', label: '生活' },
+    { href: '/about', key: 'nav.about', label: '关于' },
+];
+
+const isActive = (href: string) =>
+    href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 ---
 
-<header>
-  <div class="container header-inner">
-    <a href="/" class="logo">Morgan</a>
-    
-    <nav>
-      <ul>
-        <li><a href="/" data-i18n="nav.home">首页</a></li>
-        <li><a href="/posts" data-i18n="nav.posts">文章</a></li>
-        <li><a href="/projects" data-i18n="nav.projects">项目</a></li>
-        <li><a href="/life" data-i18n="nav.life">生活</a></li>
-        <li><a href="/about" data-i18n="nav.about">关于</a></li>
-        <li><LanguageToggle /></li>
-        <li><ThemeToggle /></li>
-      </ul>
-    </nav>
-  </div>
+<header class="site-header" data-site-header>
+    <div class="header-bar container">
+        <a href="/" class="wordmark">
+            <span class="wordmark-mark" aria-hidden="true">M</span>
+            <span class="wordmark-text">
+                <span class="wordmark-name">Morgan</span>
+                <span class="wordmark-role" data-i18n="home.eyebrow">个人博客 / 2019—至今</span>
+            </span>
+        </a>
+
+        <nav class="desktop-nav" aria-label="主导航" data-i18n-attr="aria-label:nav.primaryLabel">
+            <ul>
+                {
+                    links.map((link) => (
+                        <li>
+                            <a
+                                href={link.href}
+                                data-i18n={link.key}
+                                aria-current={isActive(link.href) ? 'page' : undefined}
+                            >
+                                {link.label}
+                            </a>
+                        </li>
+                    ))
+                }
+                <li class="nav-controls">
+                    <LanguageToggle />
+                    <ThemeToggle />
+                </li>
+            </ul>
+        </nav>
+
+        <button
+            type="button"
+            class="menu-toggle"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            data-menu-toggle
+            data-i18n-attr="aria-label:nav.menu,data-label:nav.menu"
+            data-label="菜单"
+        >
+            <span class="menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        </button>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
+        <nav aria-label="移动导航" data-i18n-attr="aria-label:nav.mobileLabel">
+            <ul>
+                {
+                    links.map((link) => (
+                        <li>
+                            <a
+                                href={link.href}
+                                data-i18n={link.key}
+                                aria-current={isActive(link.href) ? 'page' : undefined}
+                            >
+                                {link.label}
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+        <div class="mobile-controls">
+            <LanguageToggle />
+            <ThemeToggle />
+        </div>
+    </div>
 </header>
 
 <style>
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    padding: 0.75rem 0;
-  }
-  
-  .header-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1.25rem;
-    
-    /* 液态玻璃效果 - Apple Liquid Glass */
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-glass);
-    border-radius: var(--border-radius-lg);
-    
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin: 0 1rem;
-  }
-  
-  .header-inner:hover {
-    background: var(--glass-bg-strong);
-    box-shadow: var(--shadow-hover);
-    border-color: rgba(255, 255, 255, 0.25);
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-text);
-    letter-spacing: -0.02em;
-    transition: all 0.3s ease;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--border-radius-sm);
-  }
-  
-  .logo:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-light);
-  }
-  
-  nav ul {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  nav a {
-    font-size: 0.925rem;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    padding: 0.5rem 0.875rem;
-    border-radius: var(--border-radius-sm);
-    transition: all 0.2s ease;
-    position: relative;
-  }
-  
-  nav a:hover {
-    color: var(--color-text);
-    background: var(--color-bg-secondary);
-  }
-  
-  nav a:active {
-    transform: scale(0.98);
-  }
-  
-  @media (max-width: 768px) {
-    .header-inner {
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
+    .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        /* Transparent over the hero, solid once scrolled. */
+        background: transparent;
+        border-bottom: 1px solid transparent;
+        transition:
+            background-color 0.3s var(--ease-snap),
+            border-color 0.3s var(--ease-snap);
     }
-    
-    nav ul {
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.375rem;
+
+    .site-header.is-stuck {
+        background: var(--color-bg);
+        border-bottom-color: var(--color-rule);
     }
-    
-    nav a {
-      font-size: 0.875rem;
-      padding: 0.4375rem 0.75rem;
+
+    .header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        min-height: 76px;
     }
-  }
+
+    .wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-height: var(--tap-target);
+    }
+
+    .wordmark-mark {
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        background: var(--color-primary);
+        color: var(--color-bg);
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.25rem;
+        letter-spacing: -0.03em;
+        transition: transform 0.25s var(--ease-out);
+    }
+
+    .wordmark:hover .wordmark-mark {
+        transform: rotate(-6deg);
+    }
+
+    .wordmark-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.25;
+    }
+
+    .wordmark-name {
+        font-family: var(--font-display);
+        font-size: 1.125rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .wordmark-role {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        color: var(--color-text-tertiary);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .desktop-nav ul {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .desktop-nav a {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap-target);
+        padding: 0 0.875rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        transition: color 0.2s var(--ease-snap);
+    }
+
+    .desktop-nav a::after {
+        content: '';
+        position: absolute;
+        left: 0.875rem;
+        right: 0.875rem;
+        bottom: 14px;
+        height: 2px;
+        background: var(--color-primary);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.28s var(--ease-out);
+    }
+
+    .desktop-nav a:hover {
+        color: var(--color-text);
+    }
+
+    .desktop-nav a:hover::after,
+    .desktop-nav a[aria-current='page']::after {
+        transform: scaleX(1);
+    }
+
+    .desktop-nav a[aria-current='page'] {
+        color: var(--color-text);
+    }
+
+    .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: 0.5rem;
+        padding-left: 0.75rem;
+        border-left: 1px solid var(--color-rule);
+    }
+
+    .menu-toggle {
+        display: none;
+        width: var(--tap-target);
+        height: var(--tap-target);
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 1px solid var(--color-border);
+        cursor: pointer;
+    }
+
+    .menu-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 18px;
+    }
+
+    .menu-bars i {
+        display: block;
+        height: 2px;
+        background: var(--color-text);
+        transition: transform 0.25s var(--ease-snap), opacity 0.2s;
+    }
+
+    .menu-toggle[aria-expanded='true'] .menu-bars i:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+    }
+
+    .menu-toggle[aria-expanded='true'] .menu-bars i:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu-toggle[aria-expanded='true'] .menu-bars i:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+
+    .mobile-menu {
+        border-top: 1px solid var(--color-rule);
+        background: var(--color-bg);
+        padding: 1rem 1.5rem 1.5rem;
+    }
+
+    .mobile-menu[hidden] {
+        display: none;
+    }
+
+    .mobile-menu a {
+        display: flex;
+        align-items: center;
+        min-height: var(--tap-target);
+        font-family: var(--font-display);
+        font-size: 1.375rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--color-text-secondary);
+        border-bottom: 1px solid var(--color-rule);
+    }
+
+    .mobile-menu a[aria-current='page'] {
+        color: var(--color-primary);
+    }
+
+    .mobile-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+    }
+
+    @media (max-width: 900px) {
+        .desktop-nav {
+            display: none;
+        }
+
+        .menu-toggle {
+            display: inline-flex;
+        }
+
+        .header-bar {
+            min-height: 64px;
+        }
+
+        .wordmark-role {
+            display: none;
+        }
+    }
 </style>
 
 <script>
-  import { translations, type Language } from '../i18n/index.ts';
+    const header = document.querySelector('[data-site-header]');
+    const toggle = document.querySelector('[data-menu-toggle]');
+    const menu = document.querySelector('[data-mobile-menu]');
 
-  function updateLanguage() {
-    const lang = (localStorage.getItem('language') || 'zh') as Language;
-    const elements = document.querySelectorAll('[data-i18n]');
-    
-    elements.forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (key) {
-        const keys = key.split('.');
-        let value: any = translations[lang];
-        
-        for (const k of keys) {
-          if (value && typeof value === 'object') {
-            value = value[k];
-          }
+    // Solid background once the hero has scrolled away.
+    if (header) {
+      const sync = () => header.classList.toggle('is-stuck', window.scrollY > 24);
+      window.addEventListener('scroll', sync, { passive: true });
+      sync();
+    }
+
+    if (toggle && menu) {
+      let lastFocused: HTMLElement | null = null;
+
+      const setOpen = (open: boolean) => {
+        toggle.setAttribute('aria-expanded', String(open));
+        menu.hidden = !open;
+        toggle.dataset.label = open ? '关闭' : '菜单';
+        toggle.setAttribute('aria-label', open ? '关闭' : '菜单');
+
+        if (open) {
+          lastFocused = document.activeElement as HTMLElement | null;
+          menu.querySelector<HTMLElement>('a, button')?.focus();
+        } else if (lastFocused) {
+          lastFocused.focus();
         }
-        
-        if (typeof value === 'string') {
-          el.textContent = value;
+      };
+
+      toggle.addEventListener('click', () => {
+        setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+      });
+
+      // Escape closes and returns focus to the trigger.
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+          setOpen(false);
         }
+      });
+
+      menu.addEventListener('click', (event) => {
+        if ((event.target as HTMLElement).closest('a')) setOpen(false);
+      });
+
+      // Close the drawer when the viewport grows past the mobile breakpoint.
+      // addListener is the legacy fallback for older Safari.
+      const desktop = window.matchMedia('(min-width: 901px)');
+      const onBreakpoint = (event: MediaQueryListEvent) => {
+        if (event.matches) setOpen(false);
+      };
+      if (typeof desktop.addEventListener === 'function') {
+        desktop.addEventListener('change', onBreakpoint);
+      } else {
+        desktop.addListener(onBreakpoint);
       }
-    });
-  }
-
-  // 页面加载时更新语言
-  updateLanguage();
-
-  // 监听语言切换事件
-  window.addEventListener('languageChanged', () => {
-    updateLanguage();
-  });
+    }
 </script>

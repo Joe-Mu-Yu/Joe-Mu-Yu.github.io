@@ -1,0 +1,251 @@
+---
+// Hero collage: a screen-printed portrait layered onto paper scraps, a
+// terracotta disc, a code slip and a hand-drawn skyline. The paper pieces are
+// CSS and SVG so the type stays crisp and no extra image weight is added; the
+// only bitmap is the transparent portrait itself.
+---
+
+<div class="collage" data-scene>
+    <div class="collage-field">
+        <!-- Terracotta disc, sits behind the figure -->
+        <div class="piece piece-disc" data-depth="0.22" aria-hidden="true"></div>
+
+        <!-- Graph paper sheet -->
+        <div class="piece piece-grid" data-depth="0.42" aria-hidden="true"></div>
+
+        <!-- Skyline linework -->
+        <svg
+            class="piece piece-skyline"
+            data-depth="0.66"
+            viewBox="0 0 420 140"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            aria-hidden="true"
+        >
+            <path d="M0 132h420" opacity=".45"></path>
+            <path d="M18 132V86h34v46M52 132V58h30v74M82 132V96h26v36M108 132V44h38v88"></path>
+            <path d="M146 132V72h28v60M174 132V100h24v32M198 132V62h34v70M232 132V90h22v42"></path>
+            <path d="M254 132V52h40v80M294 132V82h26v50M320 132V70h30v62M350 132V98h24v34M374 132V80h28v52"></path>
+            <path d="M66 70h6M66 82h6M66 94h6M124 60h6M124 74h6M124 88h6M215 76h6M215 90h6M274 68h6M274 84h6M274 100h6M338 84h6M338 98h6"></path>
+        </svg>
+
+        <!-- Portrait -->
+        <figure class="piece piece-portrait" data-depth="0.85">
+            <img
+                src="/hero-portrait.webp"
+                alt="复古版画风格的人物插画"
+                data-i18n-attr="alt:home.collageAlt"
+                width="859"
+                height="880"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                data-portrait
+            />
+        </figure>
+
+        <!-- Code slip -->
+        <div class="piece piece-code" data-depth="1.05" aria-hidden="true">
+            <span class="code-line"></span>
+            <span class="code-line code-line-short"></span>
+            <span class="code-line"></span>
+            <span class="code-line code-line-mid"></span>
+        </div>
+
+        <!-- Caption -->
+        <figcaption class="piece piece-caption" data-depth="1.2">
+            <span data-i18n="home.collageCaption">拼贴 / 丝网印刷</span>
+        </figcaption>
+
+        <!-- Date stamp -->
+        <div class="piece piece-stamp" data-depth="1.35" aria-hidden="true">
+            <span data-i18n="home.collageStamp">2026</span>
+        </div>
+    </div>
+
+    <p class="collage-note" data-i18n="home.collageNote">token 成本 · 提示词工程 · 聊天记录</p>
+</div>
+
+<style>
+    .collage {
+        --parallax-y: 0px;
+        position: relative;
+    }
+
+    .collage-field {
+        position: relative;
+        width: min(100%, 520px);
+        margin-inline: auto;
+        aspect-ratio: 1 / 1.02;
+    }
+
+    .piece {
+        position: absolute;
+        transform: translate3d(0, var(--parallax-y), 0);
+        will-change: transform;
+    }
+
+    /* Terracotta disc behind the shoulders */
+    .piece-disc {
+        top: 12%;
+        left: 14%;
+        width: 66%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--color-primary);
+        opacity: 0.92;
+    }
+
+    /* Graph paper sheet, slightly rotated */
+    .piece-grid {
+        top: 2%;
+        right: 4%;
+        width: 62%;
+        height: 54%;
+        background-color: var(--color-bg-secondary);
+        background-image:
+            linear-gradient(var(--color-border-light) 1px, transparent 1px),
+            linear-gradient(90deg, var(--color-border-light) 1px, transparent 1px);
+        background-size: 16px 16px;
+        border: 1px solid var(--color-border);
+        transform: translate3d(0, var(--parallax-y), 0) rotate(3.5deg);
+        box-shadow: var(--shadow-md);
+    }
+
+    .piece-skyline {
+        bottom: 2%;
+        left: 0;
+        width: 88%;
+        height: auto;
+        color: var(--color-text-secondary);
+        opacity: 0.75;
+        transform: translate3d(0, var(--parallax-y), 0);
+    }
+
+    .piece-portrait {
+        bottom: 0;
+        left: 50%;
+        width: 78%;
+        margin: 0;
+        transform: translate3d(-50%, var(--parallax-y), 0);
+    }
+
+    .piece-portrait img {
+        display: block;
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(6px 6px 0 rgba(32, 32, 29, 0.16));
+    }
+
+    :global([data-theme='dark']) .piece-portrait img {
+        filter: invert(1) drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.5));
+    }
+
+    /* Code slip pinned over the shoulder */
+    .piece-code {
+        top: 30%;
+        right: -2%;
+        width: 30%;
+        padding: 0.75rem 0.875rem;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-sm);
+        transform: translate3d(0, var(--parallax-y), 0) rotate(-4deg);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .code-line {
+        display: block;
+        height: 4px;
+        background: var(--color-text-tertiary);
+        opacity: 0.65;
+    }
+
+    .code-line-short { width: 58%; background: var(--color-primary); opacity: 0.9; }
+    .code-line-mid { width: 78%; }
+
+    .piece-caption {
+        top: 6%;
+        left: 0;
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-text-tertiary);
+        transform: translate3d(0, var(--parallax-y), 0) rotate(-90deg);
+        transform-origin: left top;
+        white-space: nowrap;
+    }
+
+    .piece-stamp {
+        bottom: 26%;
+        left: 2%;
+        display: grid;
+        place-items: center;
+        width: 74px;
+        height: 74px;
+        border: 2px solid var(--color-primary);
+        border-radius: 50%;
+        color: var(--color-primary);
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        letter-spacing: 0.08em;
+        transform: translate3d(0, var(--parallax-y), 0) rotate(-12deg);
+        opacity: 0.9;
+    }
+
+    .collage-note {
+        margin-top: 1.75rem;
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-text-tertiary);
+    }
+
+    @media (max-width: 640px) {
+        .collage-field {
+            width: min(100%, 400px);
+        }
+
+        .piece-code {
+            right: 0;
+            width: 34%;
+        }
+    }
+
+    /* Single-column hero (the grid collapses at 1024px): the rotated side
+       caption would extend upwards out of the collage and collide with the
+       CTA buttons above it, so lay it flat inside the frame instead. */
+    @media (max-width: 1024px) {
+        .piece-caption {
+            top: 3%;
+            left: 4px;
+            transform: translate3d(0, var(--parallax-y), 0);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .piece {
+            --parallax-y: 0px !important;
+            will-change: auto;
+        }
+    }
+</style>
+
+<script>
+    // If the portrait fails to load, keep the collage readable: the paper
+    // pieces still compose, and we drop the empty frame rather than showing a
+    // broken-image box.
+    document.querySelectorAll('[data-portrait]').forEach((img) => {
+        img.addEventListener('error', () => {
+            const figure = img.closest('.piece-portrait');
+            figure?.setAttribute('hidden', '');
+        });
+    });
+</script>

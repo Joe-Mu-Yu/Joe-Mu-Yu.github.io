@@ -6,8 +6,6 @@ tags: ["AI", "提示词工程", "学习笔记"]
 layout: ../../layouts/PostLayout.astro
 ---
 
-# 提示词工程学习笔记
-
 ---
 
 ## 一、核心概念

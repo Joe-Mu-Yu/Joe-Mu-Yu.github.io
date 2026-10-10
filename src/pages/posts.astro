@@ -1,56 +1,56 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import { getSortedPosts } from '../lib/posts';
 
-// 文章数据
-// 获取所有文章
-const allPosts = await Astro.glob('./posts/*.md');
-
-// 格式化并排序文章数据
-const posts = allPosts
-  .sort((a, b) => new Date(b.frontmatter.date).valueOf() - new Date(a.frontmatter.date).valueOf())
-  .map(post => ({
-    title: post.frontmatter.title,
-    description: post.frontmatter.description,
-    date: new Date(post.frontmatter.date),
-    tags: post.frontmatter.tags,
-    href: post.url
-  }));
+const posts = (await getSortedPosts())
+    .map((post) => ({
+        title: post.frontmatter.title,
+        description: post.frontmatter.description ?? '',
+        date: new Date(post.frontmatter.date),
+        tags: post.frontmatter.tags,
+        href: post.url,
+    }));
 ---
 
-<BaseLayout title="Posts - Morgan">
-  <div class="container section">
-    <h1>文章</h1>
-    <div class="posts-grid">
-      {posts.map(post => (
-        <ArticleCard {...post} />
-      ))}
+<BaseLayout title="文章 - Morgan" description="Morgan 的技术文章与学习笔记。" titleKey="meta.postsTitle" descriptionKey="meta.postsDescription">
+    <header class="page-head">
+        <div class="container">
+            <p class="eyebrow" data-i18n="home.postsIndex">01 / 文章</p>
+            <h1 data-i18n="posts.title">文章</h1>
+            <p class="lede" data-i18n="posts.lede">技术分享、学习笔记和思考。</p>
+            <p class="page-count" data-i18n="posts.count" data-i18n-n={posts.length}>共 {posts.length} 篇</p>
+        </div>
+    </header>
+
+    <div class="container section">
+        <div class="post-list">
+            {posts.map((post) => <ArticleCard {...post} />)}
+        </div>
     </div>
-  </div>
 </BaseLayout>
 
 <style>
-  .section {
-    padding: 5rem 1rem 4rem;
-    max-width: var(--max-width);
-    margin: 0 auto;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 2.5rem;
-    color: var(--color-text);
-    text-align: center;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
+    .page-count {
+        margin-top: 1.25rem;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        letter-spacing: 0.12em;
+        color: var(--color-text-tertiary);
+    }
 
-  .posts-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-  
-  /* 文章卡片已使用液态玻璃效果 (ArticleCard.astro) */
-  /* 8% 透明度 + blur(40px) saturate(180%) + 三层阴影 */
+    .section {
+        padding: 2.5rem 1.5rem 5rem;
+    }
+
+    .post-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media (max-width: 640px) {
+        .section {
+            padding: 2rem 1.5rem 3.5rem;
+        }
+    }
 </style>

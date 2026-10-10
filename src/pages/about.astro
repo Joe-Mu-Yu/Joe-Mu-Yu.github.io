@@ -1,98 +1,325 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import InteractiveMap from '../components/InteractiveMap.astro';
+
+const skills = [
+    { group: 'Frontend', items: 'Astro · TypeScript · React · Vue' },
+    { group: 'Backend', items: 'Node.js · Python · Rails' },
+    { group: 'AI', items: '模型调用 · 提示词工程 · 代码评测' },
+    { group: 'DevOps', items: 'Docker · CI/CD' },
+];
+
+const channels = [
+    { label: 'Email', value: 'joerocker516@gmail.com', href: 'mailto:joerocker516@gmail.com' },
+    { label: 'GitHub', value: '@Joe-Mu-Yu', href: 'https://github.com/Joe-Mu-Yu' },
+];
 ---
 
-<BaseLayout title="About - Morgan">
-  <div class="container section">
-    <h1>关于我</h1>
-    <div class="content">
-      <p>Hi, 我是 Morgan。</p>
-      <p>编程爱好者 / AI爱好者 / 探索生活的美好</p>
-      
-      <InteractiveMap />
-      
-      <h2>我的技能</h2>
-      <ul>
-        <li>Frontend: React, Vue, Astro</li>
-        <li>Backend: Node.js, Python</li>
-        <li>DevOps: Docker, CI/CD</li>
-      </ul>
+<BaseLayout title="关于 - Morgan" description="关于 Morgan：编程、AI 与生活。" titleKey="meta.aboutTitle" descriptionKey="meta.aboutDescription">
+    <header class="page-head">
+        <div class="container about-head">
+            <div class="about-head-copy">
+                <p class="eyebrow" data-i18n="about.index">04 / 关于</p>
+                <h1 data-i18n="about.title">关于</h1>
+                <p class="lede" data-i18n="about.lede">Morgan，编程与 AI 爱好者。</p>
+            </div>
 
-      <h2>联系我</h2>
-      <p>
-        Email: <a href="mailto:joerocker516@gmail.com">joerocker516@gmail.com</a><br/>
-        GitHub: <a href="https://github.com/Joe-Mu-Yu">@Joe-Mu-Yu</a>
-      </p>
+            <figure class="about-portrait" data-reveal>
+                <span class="portrait-disc" aria-hidden="true"></span>
+                <span class="portrait-sheet" aria-hidden="true"></span>
+                <img
+                    src="/hero-portrait.webp"
+                    alt="复古版画风格的人物插画"
+                    data-i18n-attr="alt:home.collageAlt"
+                    width="859"
+                    height="880"
+                    decoding="async"
+                />
+                <figcaption class="portrait-caption" data-i18n="home.collageCaption">拼贴 / 丝网印刷</figcaption>
+                <span class="portrait-stamp" data-i18n="home.collageStamp" aria-hidden="true">2026</span>
+            </figure>
+        </div>
+    </header>
+
+    <div class="container about-grid section">
+        <section class="about-block" aria-labelledby="about-intro-heading">
+            <p class="section-index">01</p>
+            <h2 id="about-intro-heading" data-i18n="about.introTitle">谁是 Morgan</h2>
+            <p data-i18n="about.intro">
+                写代码、写文章，也折腾一些自己的小工具。站点这里是一个个人博客：记下踩过的坑、查过的结论，和些还没形成结论的东西。
+            </p>
+        </section>
+
+        <section class="about-block" aria-labelledby="about-skills-heading">
+            <p class="section-index">02</p>
+            <h2 id="about-skills-heading" data-i18n="about.skills">在用的东西</h2>
+            <dl class="skill-list">
+                {
+                    skills.map((skill) => (
+                        <div class="skill-row">
+                            <dt>{skill.group}</dt>
+                            <dd data-i18n={skill.group === 'AI' ? 'about.skillsAI' : undefined}>{skill.items}</dd>
+                        </div>
+                    ))
+                }
+            </dl>
+        </section>
+
+        <section class="about-block about-map" aria-labelledby="about-map-heading">
+            <p class="section-index">03</p>
+            <h2 id="about-map-heading" data-i18n="about.mapTitle">去过的地方</h2>
+            <InteractiveMap />
+        </section>
+
+        <section class="about-block" aria-labelledby="about-contact-heading">
+            <p class="section-index">04</p>
+            <h2 id="about-contact-heading" data-i18n="about.contact">联系</h2>
+            <ul class="channel-list">
+                {
+                    channels.map((channel) => (
+                        <li>
+                            <a href={channel.href} target={channel.href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
+                                <span class="channel-label">{channel.label}</span>
+                                <span class="channel-value">{channel.value}</span>
+                            </a>
+                        </li>
+                    ))
+                }
+            </ul>
+        </section>
     </div>
-  </div>
 </BaseLayout>
 
 <style>
-  .section {
-    padding: 5rem 1rem 4rem;
-    max-width: var(--max-width-narrow);
-    margin: 0 auto;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    color: var(--color-text);
-    text-align: center;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
+    .section {
+        padding: 3.5rem 1.5rem 5rem;
+    }
 
-  h2 {
-    font-size: 1.5rem;
-    margin: 2.5rem 0 1.25rem;
-    color: var(--color-text);
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
+    .about-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 2.5rem 3.5rem;
+    }
 
-  .content {
-    font-size: 1rem;
-    color: var(--color-text-secondary);
-    line-height: 1.8;
-  }
+    .about-head-copy {
+        min-width: 0;
+    }
 
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 1.5rem 0;
-  }
-  
-  ul li {
-    padding: 0.75rem 1rem;
-    margin: 0.5rem 0;
-    
-    /* 液态玻璃效果 */
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--border-radius-lg);
-    transition: all 0.2s ease;
-  }
-  
-  ul li:hover {
-    background: var(--glass-bg-strong);
-    transform: translateX(4px);
-    border-color: rgba(255, 255, 255, 0.25);
-  }
+    .about-portrait {
+        position: relative;
+        width: clamp(240px, 30vw, 360px);
+        aspect-ratio: 1 / 1.04;
+        margin: 0;
+        justify-self: end;
+    }
 
-  a {
-    color: var(--color-primary);
-    text-decoration: none;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    font-weight: 500;
-  }
-  
-  a:hover {
-    background: var(--color-primary-light);
-  }
+    .portrait-disc {
+        position: absolute;
+        top: 10%;
+        left: 12%;
+        width: 66%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--color-primary);
+        opacity: 0.92;
+    }
+
+    .portrait-sheet {
+        position: absolute;
+        top: 0;
+        right: 4%;
+        width: 60%;
+        height: 52%;
+        background-color: var(--color-bg-secondary);
+        background-image:
+            linear-gradient(var(--color-border-light) 1px, transparent 1px),
+            linear-gradient(90deg, var(--color-border-light) 1px, transparent 1px);
+        background-size: 16px 16px;
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-md);
+        transform: rotate(3.5deg);
+    }
+
+    .about-portrait img {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        z-index: 2;
+        display: block;
+        width: 84%;
+        height: auto;
+        transform: translateX(-50%);
+        filter: drop-shadow(6px 6px 0 rgba(32, 32, 29, 0.16));
+    }
+
+    :global([data-theme='dark']) .about-portrait img {
+        filter: invert(1) drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.5));
+    }
+
+    .portrait-caption {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 3;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-text-tertiary);
+        white-space: nowrap;
+    }
+
+    .portrait-stamp {
+        position: absolute;
+        bottom: 24%;
+        left: 0;
+        z-index: 3;
+        display: grid;
+        place-items: center;
+        width: 62px;
+        height: 62px;
+        border: 2px solid var(--color-primary);
+        border-radius: 50%;
+        color: var(--color-primary);
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        letter-spacing: 0.08em;
+        transform: rotate(-12deg);
+        opacity: 0.9;
+    }
+
+    .about-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 3.5rem 3rem;
+    }
+
+    .about-block {
+        min-width: 0;
+    }
+
+    .about-map {
+        grid-column: 1 / -1;
+        width: 100%;
+        max-width: 46rem;
+        justify-self: center;
+    }
+
+    .about-block h2 {
+        margin: 0.75rem 0 1.25rem;
+        font-family: var(--font-display);
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        text-wrap: balance;
+    }
+
+    .about-block > p:not(.section-index) {
+        color: var(--color-text-secondary);
+        line-height: 1.85;
+        max-width: 46ch;
+    }
+
+    .skill-list {
+        margin: 0;
+    }
+
+    .skill-row {
+        display: grid;
+        grid-template-columns: 6.5rem 1fr;
+        gap: 1rem;
+        padding: 0.875rem 0;
+        border-top: 1px solid var(--color-rule);
+    }
+
+    .skill-row:last-child {
+        border-bottom: 1px solid var(--color-rule);
+    }
+
+    .skill-row dt {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        color: var(--color-text-tertiary);
+        padding-top: 0.2rem;
+    }
+
+    .skill-row dd {
+        margin: 0;
+        color: var(--color-text);
+        line-height: 1.7;
+    }
+
+    .channel-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .channel-list a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-height: var(--tap-target);
+        padding: 0 0;
+        border-top: 1px solid var(--color-rule);
+        color: var(--color-text);
+        text-decoration: none;
+    }
+
+    .channel-list li:last-child a {
+        border-bottom: 1px solid var(--color-rule);
+    }
+
+    .channel-label {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        color: var(--color-text-tertiary);
+    }
+
+    .channel-value {
+        font-weight: 600;
+        transition: color 0.2s var(--ease-snap);
+    }
+
+    .channel-list a:hover .channel-value,
+    .channel-list a:focus-visible .channel-value {
+        color: var(--color-primary);
+    }
+
+    @media (max-width: 1024px) {
+        .about-head {
+            grid-template-columns: 1fr;
+        }
+
+        .about-portrait {
+            justify-self: center;
+            width: clamp(220px, 56vw, 320px);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .section {
+            padding: 2.5rem 1.5rem 3.5rem;
+        }
+
+        .about-grid {
+            gap: 2.75rem;
+        }
+
+        .skill-row {
+            grid-template-columns: 1fr;
+            gap: 0.25rem;
+        }
+
+        .portrait-stamp {
+            width: 52px;
+            height: 52px;
+            font-size: 0.75rem;
+        }
+    }
 </style>

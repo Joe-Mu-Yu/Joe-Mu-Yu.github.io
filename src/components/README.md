@@ -281,5 +281,5 @@ const { title } = Astro.props;
 ## 📚 相关文档
 
 - [全局样式](../styles/README.md)
-- [页面组件](../pages/README.md)
+- [页面组件](../../docs/PAGES.md)
 - [国际化](../i18n/README.md)

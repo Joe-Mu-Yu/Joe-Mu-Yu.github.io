@@ -497,5 +497,5 @@ p, span {
 ## 📚 相关文档
 
 - [组件库](../components/README.md)
-- [页面目录](../pages/README.md)
+- [页面目录](../../docs/PAGES.md)
 - [国际化](../i18n/README.md)

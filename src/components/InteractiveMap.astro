@@ -1,202 +1,603 @@
 ---
-// 简化的中国地图组件 - 使用静态图片+标记点
-interface Pin {
-  name: string;
-  position: { top: string; left: string }; // 相对位置百分比
+// Map of the places visited so far, drawn from the simplified China outline in
+// src/data/china-map.ts. The outline and the pins share one projection, so a
+// pin always sits on the right spot; the frame uses the same aspect ratio as
+// the SVG viewBox for the same reason.
+//
+// The six cities sit close together in northern China, so label sides and a
+// couple of vertical nudges are set by hand to keep the chips from colliding.
+// Below ~700px frame width the name chips are dropped and only the tooltip
+// (tap / focus) carries the name.
+import { CHINA_VIEW_BOX, CHINA_LAND_PATHS, CHINA_PINS } from '../data/china-map';
+
+interface Labelled extends (typeof CHINA_PINS)[number] {
+    label: 'left' | 'right';
+    nudge: number;
 }
 
-// 旅行地点数据（使用相对位置）
-const travelPins: Pin[] = [
-  { name: '北京', position: { top: '30%', left: '60%' } },
-  { name: '上海', position: { top: '48%', left: '68%' } },
-  { name: '成都', position: { top: '52%', left: '45%' } },
-  { name: '西安', position: { top: '42%', left: '50%' } },
-  { name: '杭州', position: { top: '50%', left: '66%' } },
-  { name: '深圳', position: { top: '72%', left: '60%' } },
-];
+const labelStyle: Record<string, { label: 'left' | 'right'; nudge: number }> = {
+    beijing: { label: 'right', nudge: -3 },
+    shijiazhuang: { label: 'right', nudge: 0 },
+    taiyuan: { label: 'left', nudge: 0 },
+    xian: { label: 'left', nudge: 0 },
+    jinan: { label: 'left', nudge: 8 },
+    qingdao: { label: 'right', nudge: 0 },
+};
+
+const pins: Labelled[] = CHINA_PINS.map((pin) => ({ ...pin, ...labelStyle[pin.key] }));
+
+// Travel order: Beijing → Shijiazhuang → Taiyuan → Xi’an → Jinan → Qingdao.
+const routeOrder = ['beijing', 'shijiazhuang', 'taiyuan', 'xian', 'jinan', 'qingdao'];
+const route = routeOrder
+    .map((key) => CHINA_PINS.find((pin) => pin.key === key))
+    .filter((pin): pin is (typeof CHINA_PINS)[number] => Boolean(pin))
+    .map((pin) => `${pin.x},${pin.y}`)
+    .join(' ');
+
+const [mainland, ...islands] = CHINA_LAND_PATHS;
+const pinCount = pins.length;
 ---
 
-<div class="map-container">
-  <div class="china-map-wrapper">
-    <!-- 使用中国地图背景 -->
-    <div class="china-map-bg"></div>
-    
-    <!-- 旅行地点标记 -->
-    {travelPins.map(pin => (
-      <div 
-        class="travel-marker" 
-        style={`top: ${pin.position.top}; left: ${pin.position.left};`}
-        data-name={pin.name}
-      >
-        <span class="flag">🚩</span>
-        <span class="tooltip">{pin.name}</span>
-      </div>
-    ))}
-  </div>
-  
-  <div class="map-legend">
-    <div class="legend-item">
-      <span class="flag-icon">🚩</span>
-      <span>旅行地</span>
+<figure class="schematic-map" data-reveal>
+    <div class="map-frame">
+        <div class="map-top" aria-hidden="true">
+            <span class="map-kicker" data-i18n="about.mapBadge">中国地图</span>
+            <span class="map-count" data-i18n="about.mapCount" data-i18n-n={pinCount}>已标记 {pinCount} 座城市</span>
+        </div>
+
+        <svg class="map-svg" viewBox={CHINA_VIEW_BOX} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+            <!-- Graticule: soft curved latitude / longitude lines, under the land -->
+            <g class="graticule">
+                <path d="M0 64 Q220 52 440 64"></path>
+                <path d="M0 128 Q220 114 440 128"></path>
+                <path d="M0 192 Q220 178 440 192"></path>
+                <path d="M0 256 Q220 242 440 256"></path>
+                <path d="M88 0 Q74 160 88 320"></path>
+                <path d="M176 0 Q160 160 176 320"></path>
+                <path d="M264 0 Q248 160 264 320"></path>
+                <path d="M352 0 Q336 160 352 320"></path>
+            </g>
+
+            <!-- Corner brackets -->
+            <g class="corner-marks">
+                <path d="M8 28 V8 H28"></path>
+                <path d="M412 8 H432 V28"></path>
+                <path d="M8 292 V312 H28"></path>
+                <path d="M412 312 H432 V292"></path>
+            </g>
+
+            <!-- Compass rose, out in the sea east of Taiwan -->
+            <g class="compass" transform="translate(395 258)">
+                <circle r="17"></circle>
+                <path class="compass-needle" d="M0 -13 L5 4 L0 0.5 L-5 4 Z"></path>
+                <text y="31">N</text>
+            </g>
+
+            <!-- Coastline halo, then the land itself -->
+            <path class="land-halo" d={mainland}></path>
+            {CHINA_LAND_PATHS.map((path) => <path class="land" d={path} />)}
+
+            <!-- Coordinate ticks, drawn above the land so they never sink under a coastline -->
+            <g class="ticks">
+                <text x="2" y="114">45°N</text>
+                <text x="2" y="194">35°N</text>
+                <text x="2" y="274">25°N</text>
+                <text x="30" y="40">80°E</text>
+                <text x="170" y="40">100°E</text>
+                <text x="310" y="40">120°E</text>
+            </g>
+
+            <!-- Travel route -->
+            <polyline class="route" points={route}></polyline>
+        </svg>
+
+        <ul class="pin-list" role="list">
+            {
+                pins.map((pin, index) => (
+                    <li
+                        class={`pin-item pin-item--label-${pin.label}`}
+                        style={`top:${pin.top};left:${pin.left};--label-nudge:${pin.nudge}px;--pulse-delay:${(index * 0.4).toFixed(2)}s;`}
+                    >
+                        <button
+                            type="button"
+                            class="pin"
+                            data-map-pin={index}
+                            aria-describedby={`pin-note-${index}`}
+                        >
+                            <span class="pin-dot" aria-hidden="true"></span>
+                            <span class="pin-name" data-i18n={`about.places.${pin.key}`}>{pin.name}</span>
+                        </button>
+                        <span class="pin-note" id={`pin-note-${index}`} data-pin-note={index} data-i18n={`about.placeNotes.${pin.key}`}>
+                            {pin.name}，标记的是大致位置。
+                        </span>
+                    </li>
+                ))
+            }
+        </ul>
+
+        <div class="map-legend" aria-hidden="true">
+            <span class="legend-item">
+                <span class="legend-dot"></span>
+                <span data-i18n="about.mapLegendCity">城市</span>
+            </span>
+            <span class="legend-item">
+                <span class="legend-line"></span>
+                <span data-i18n="about.mapLegendRoute">旅行路线</span>
+            </span>
+        </div>
     </div>
-  </div>
-</div>
+
+    <figcaption class="map-caption">
+        <span class="map-caption-main" data-i18n="about.mapNote">
+            地图按中国轮廓简化绘制，标记的是城市的大致位置，不是精确坐标。
+        </span>
+        <span class="map-hint" data-i18n="about.mapHint">用方向键或 Tab 在地点之间移动，聚焦后查看说明。</span>
+    </figcaption>
+</figure>
 
 <style>
-  .map-container {
-    position: relative;
-    width: 100%;
-    margin: 2rem 0;
-    border-radius: 24px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-
-  .china-map-wrapper {
-    position: relative;
-    width: 100%;
-    padding-bottom: 75%; /* 4:3 宽高比 */
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  }
-
-  .china-map-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><path d="M400 100 L500 150 L580 200 L620 280 L600 380 L550 450 L450 480 L350 450 L280 380 L250 280 L280 200 L350 150 Z" fill="%23e0e0e0" stroke="%23999" stroke-width="2"/></svg>');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.3;
-  }
-
-  .travel-marker {
-    position: absolute;
-    transform: translate(-50%, -100%);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 5;
-  }
-
-  .travel-marker .flag {
-    display: block;
-    font-size: 28px;
-    filter: hue-rotate(15deg) saturate(1.2);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    animation: wave 2s ease-in-out infinite;
-  }
-
-  @keyframes wave {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    75% { transform: rotate(5deg); }
-  }
-
-  .travel-marker:hover {
-    z-index: 10;
-  }
-
-  .travel-marker:hover .flag {
-    transform: scale(1.2);
-    filter: hue-rotate(15deg) saturate(1.5) brightness(1.1);
-  }
-
-  .tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 140, 0, 0.95);
-    color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: rgba(255, 140, 0, 0.95);
-  }
-
-  .travel-marker:hover .tooltip {
-    opacity: 1;
-  }
-
-  .map-legend {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
-    z-index: 10;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    color: #333;
-  }
-
-  .flag-icon {
-    font-size: 1.2rem;
-    filter: hue-rotate(15deg);
-  }
-
-  @media (max-width: 768px) {
-    .china-map-wrapper {
-      padding-bottom: 100%; /* 移动端使用正方形 */
+    .schematic-map {
+        margin: 0;
     }
 
-    .travel-marker .flag {
-      font-size: 24px;
+    .map-frame {
+        position: relative;
+        width: 100%;
+        /* Matches the 440×320 viewBox so percentage pins stay glued to the
+           artwork at every width. */
+        aspect-ratio: 11 / 8;
+        background:
+            radial-gradient(120% 90% at 70% 0%, var(--color-bg) 0%, var(--color-bg-secondary) 55%);
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
     }
 
-    .tooltip {
-      font-size: 0.75rem;
-      padding: 0.3rem 0.6rem;
+    /* Hairline inner frame, like a printed map plate */
+    .map-frame::before {
+        content: '';
+        position: absolute;
+        inset: 7px;
+        border: 1px solid var(--color-rule);
+        pointer-events: none;
+        z-index: 3;
     }
-  }
 
-  @media (prefers-color-scheme: dark) {
-    .map-container {
-      background: #1a1a1a;
+    .map-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
     }
 
-    .china-map-wrapper {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+    .graticule path {
+        fill: none;
+        stroke: var(--color-rule);
+        stroke-width: 1;
+        stroke-dasharray: 2 6;
+        vector-effect: non-scaling-stroke;
+        opacity: 0.85;
+    }
+
+    .ticks text,
+    .compass text {
+        font-family: var(--font-mono);
+        font-size: 7.5px;
+        letter-spacing: 0.08em;
+        fill: var(--color-text-tertiary);
+        opacity: 0.75;
+    }
+
+    .compass text {
+        text-anchor: middle;
+        font-size: 9px;
+        opacity: 0.9;
+    }
+
+    .corner-marks path {
+        fill: none;
+        stroke: var(--color-text-tertiary);
+        stroke-width: 1.25;
+        vector-effect: non-scaling-stroke;
+        opacity: 0.6;
+    }
+
+    .compass circle {
+        fill: none;
+        stroke: var(--color-text-tertiary);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+        opacity: 0.55;
+    }
+
+    .compass-needle {
+        fill: var(--color-primary);
+        opacity: 0.9;
+    }
+
+    .land-halo {
+        fill: none;
+        stroke: var(--color-primary);
+        stroke-width: 6;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+        opacity: 0.14;
+    }
+
+    .land {
+        fill: var(--color-bg-tertiary);
+        stroke: var(--color-text-secondary);
+        stroke-width: 1.3;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+    }
+
+    .route {
+        fill: none;
+        stroke: var(--color-primary);
+        stroke-width: 1.6;
+        stroke-dasharray: 6 6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        vector-effect: non-scaling-stroke;
+        opacity: 0.85;
+        animation: route-march 24s linear infinite;
+    }
+
+    @keyframes route-march {
+        to {
+            stroke-dashoffset: -240;
+        }
+    }
+
+    /* ---------- Overlays inside the frame ---------- */
+
+    .map-top {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        right: 16px;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        pointer-events: none;
+    }
+
+    .map-kicker {
+        padding: 0.2rem 0.5rem;
+        background: var(--color-primary);
+        color: var(--color-bg);
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .map-count {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.1em;
+        color: var(--color-text-tertiary);
+        padding: 0.2rem 0.5rem;
+        background: var(--color-bg);
+        box-shadow: 0 1px 0 rgb(0 0 0 / 0.04);
     }
 
     .map-legend {
-      background: rgba(30, 30, 30, 0.95);
+        position: absolute;
+        left: 16px;
+        bottom: 16px;
+        z-index: 4;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.9rem;
+        pointer-events: none;
     }
 
     .legend-item {
-      color: #e0e0e0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.08em;
+        color: var(--color-text-tertiary);
     }
-  }
+
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        box-shadow: 0 0 0 2px var(--color-bg);
+    }
+
+    .legend-line {
+        width: 22px;
+        border-top: 2px dashed var(--color-primary);
+        opacity: 0.85;
+    }
+
+    /* ---------- Pins ---------- */
+
+    .pin-list {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        z-index: 5;
+    }
+
+    .pin-item {
+        position: absolute;
+        /* Zero-size anchor: `top`/`left` is the exact coordinate, and both the
+           button and the tooltip position themselves from this point. */
+        width: 0;
+        height: 0;
+    }
+
+    .pin {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        height: var(--tap-target);
+        padding: 0;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+    }
+
+    /* Shift the button so the dot — not the whole dot+label box — sits on the
+       coordinate, whichever side the label is on. */
+    .pin-item--label-right .pin {
+        transform: translate(-5px, -50%);
+    }
+
+    .pin-item--label-left .pin {
+        flex-direction: row-reverse;
+        transform: translate(calc(5px - 100%), -50%);
+    }
+
+    .pin-dot {
+        position: relative;
+        width: 10px;
+        height: 10px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: var(--color-primary);
+        box-shadow: 0 0 0 2.5px var(--color-bg-secondary);
+        transition: transform 0.2s var(--ease-snap);
+    }
+
+    .pin-dot::after {
+        content: '';
+        position: absolute;
+        inset: -5px;
+        border: 1px solid var(--color-primary);
+        border-radius: 50%;
+        opacity: 0;
+        animation: pin-pulse 3s var(--ease-out) infinite;
+        animation-delay: var(--pulse-delay, 0s);
+    }
+
+    @keyframes pin-pulse {
+        0% {
+            transform: scale(0.6);
+            opacity: 0.7;
+        }
+        70% {
+            transform: scale(1.6);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1.6);
+            opacity: 0;
+        }
+    }
+
+    .pin-name {
+        transform: translateY(var(--label-nudge, 0));
+        padding: 0.15rem 0.45rem;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.08em;
+        color: var(--color-text-secondary);
+        white-space: nowrap;
+        transition:
+            color 0.2s var(--ease-snap),
+            border-color 0.2s var(--ease-snap),
+            background-color 0.2s var(--ease-snap),
+            box-shadow 0.2s var(--ease-snap);
+    }
+
+    .pin:hover .pin-dot,
+    .pin:focus-visible .pin-dot,
+    .pin.is-selected .pin-dot {
+        transform: scale(1.25);
+    }
+
+    .pin:hover .pin-name,
+    .pin:focus-visible .pin-name,
+    .pin.is-selected .pin-name {
+        color: var(--color-bg);
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .pin-note {
+        position: absolute;
+        left: 0;
+        top: 0.9rem;
+        transform: translateX(-50%);
+        width: max-content;
+        min-width: 9.5rem;
+        max-width: 12rem;
+        padding: 0.5rem 0.65rem;
+        background: var(--color-text);
+        color: var(--color-bg);
+        font-size: 0.75rem;
+        line-height: 1.5;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition:
+            opacity 0.2s var(--ease-snap),
+            visibility 0.2s var(--ease-snap);
+        z-index: 6;
+    }
+
+    .pin-note::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: -5px;
+        transform: translateX(-50%);
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid var(--color-text);
+    }
+
+    .pin-note.is-visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* ---------- Caption ---------- */
+
+    .map-caption {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-top: 1rem;
+        padding-left: 0.875rem;
+        border-left: 2px solid var(--color-primary);
+        font-size: 0.8125rem;
+        line-height: 1.65;
+        color: var(--color-text-tertiary);
+    }
+
+    .map-hint {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.04em;
+        opacity: 0.85;
+    }
+
+    /* Below ~700px of frame (≈747px of viewport) the six northern cities are
+       too close together for name chips; the dot alone is shown and the name
+       arrives with the tooltip on tap or focus. */
+    @media (max-width: 747px) {
+        .pin-name {
+            display: none;
+        }
+
+        .pin.is-selected .pin-name {
+            display: block;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .map-top {
+            top: 12px;
+            left: 12px;
+            right: 12px;
+        }
+
+        .map-legend {
+            left: 12px;
+            bottom: 12px;
+            gap: 0.6rem;
+        }
+
+        .pin-note {
+            min-width: 8rem;
+            max-width: 10rem;
+            font-size: 0.6875rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .route,
+        .pin-dot::after {
+            animation: none;
+        }
+    }
 </style>
+
+<script>
+    // Arrow keys move between pins. Focus or click reveals the note.
+    // Only one map exists per page (the About page).
+    const root = document.querySelector<HTMLElement>('.schematic-map');
+    const pinButtons = Array.from(
+        root?.querySelectorAll<HTMLButtonElement>('[data-map-pin]') ?? [],
+    );
+
+    if (pinButtons.length > 0) {
+        const notes = Array.from(root?.querySelectorAll<HTMLElement>('[data-pin-note]') ?? []);
+
+        const select = (index: number) => {
+            pinButtons.forEach((button, i) => button.classList.toggle('is-selected', i === index));
+            notes.forEach((note, i) => note.classList.toggle('is-visible', i === index));
+        };
+
+        const STEPS: Record<string, number> = {
+            ArrowRight: 1,
+            ArrowDown: 1,
+            ArrowLeft: -1,
+            ArrowUp: -1,
+        };
+
+        const dotCenter = (index: number) => {
+            const dot = pinButtons[index].querySelector<HTMLElement>('.pin-dot');
+            if (!dot) return null;
+            const rect = dot.getBoundingClientRect();
+            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        };
+
+        // The northern cluster is only a few pixels wide on small screens, so
+        // overlapping hit boxes can hand the tap to a neighbouring city. Route
+        // the click to whichever dot is actually closest to the touch point.
+        const nearestTo = (x: number, y: number) => {
+            let best = -1;
+            let bestDistance = Number.POSITIVE_INFINITY;
+            pinButtons.forEach((_, index) => {
+                const center = dotCenter(index);
+                if (!center) return;
+                const distance = Math.hypot(center.x - x, center.y - y);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    best = index;
+                }
+            });
+            return bestDistance <= 24 ? best : -1;
+        };
+
+        pinButtons.forEach((button, index) => {
+            button.addEventListener('click', (event) => {
+                const nearest = nearestTo(event.clientX, event.clientY);
+                select(nearest >= 0 ? nearest : index);
+            });
+            button.addEventListener('focus', () => select(index));
+            button.addEventListener('keydown', (event) => {
+                const step = STEPS[event.key];
+                if (!step) return;
+                event.preventDefault();
+                pinButtons[(index + step + pinButtons.length) % pinButtons.length].focus();
+            });
+        });
+
+        // No selection is made on load: the map reads as a static diagram
+        // until the visitor picks a place.
+    }
+</script>

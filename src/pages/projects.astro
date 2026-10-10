@@ -1,119 +1,113 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import { fetchProjects, GITHUB_USERNAME } from '../lib/github';
 
-// 从 GitHub API 获取项目数据
-const GITHUB_USERNAME = 'Joe-Mu-Yu';
-const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=50`;
-
-// 手动补充的项目（如果 API 获取失败或需要额外项目）
-const manualProjects = [
-  {
-    title: 'Joe-Mu-Yu.github.io',
-    description: '个人博客网站，采用 Astro 构建，白色透明毛玻璃设计风格',
-    href: 'https://github.com/Joe-Mu-Yu/Joe-Mu-Yu.github.io',
-    icon: '🌐',
-    language: 'TypeScript',
-    stars: 0,
-    forks: 0
-  }
-];
-
-// 获取 GitHub 仓库数据
-async function fetchGitHubRepos() {
-  try {
-    const response = await fetch(GITHUB_API);
-    if (!response.ok) throw new Error('Failed to fetch GitHub repos');
-    const repos = await response.json();
-    
-    // 过滤掉 fork 的项目，只显示原创项目
-    const originalRepos = repos.filter(repo => !repo.fork);
-    
-    const githubProjects = originalRepos.map(repo => ({
-      title: repo.name,
-      description: repo.description || '暂无描述',
-      href: repo.html_url,
-      language: repo.language,
-      stars: repo.stargazers_count,
-      forks: repo.forks_count,
-      updatedAt: new Date(repo.updated_at).toLocaleDateString('zh-CN'),
-      icon: getRepoIcon(repo.name)
-    }));
-    
-    // 合并手动项目（排除重复）
-    const existingTitles = new Set(githubProjects.map(p => p.title));
-    const additionalProjects = manualProjects.filter(p => !existingTitles.has(p.title));
-    
-    return [...githubProjects, ...additionalProjects];
-  } catch (error) {
-    console.error('Error fetching GitHub repos:', error);
-    // 如果 API 失败，返回手动项目
-    return manualProjects;
-  }
-}
-
-// 根据项目名获取图标 emoji
-function getRepoIcon(repoName: string): string {
-  const iconMap: Record<string, string> = {
-    'OpenIsle': '🏝️',
-    'weekly': '📰',
-    'pythermalcomfort': '🌡️',
-    'Learn_Prompting': '📚',
-    'blog': '📝',
-    'website': '🌐',
-    'app': '📱',
-    'tool': '🔧',
-    'ai': '🤖',
-    'web': '🕸️'
-  };
-  
-  // 查找匹配的图标
-  for (const [key, icon] of Object.entries(iconMap)) {
-    if (repoName.toLowerCase().includes(key.toLowerCase())) {
-      return icon;
-    }
-  }
-  
-  // 默认图标
-  return '🚀';
-}
-
-const projects = await fetchGitHubRepos();
+const { projects, usedFallback } = await fetchProjects();
 ---
 
-<BaseLayout title="Projects - Morgan">
-  <div class="container section">
-    <h1>项目</h1>
-    <div class="projects-grid">
-      {projects.map(project => (
-        <ProjectCard {...project} />
-      ))}
+<BaseLayout title="项目 - Morgan" description="Morgan 的开源仓库和个人作品。" titleKey="meta.projectsTitle" descriptionKey="meta.projectsDescription">
+    <header class="page-head">
+        <div class="container">
+            <p class="eyebrow" data-i18n="home.projectsIndex">02 / 项目</p>
+            <h1 data-i18n="projects.title">项目</h1>
+            <p class="lede" data-i18n="projects.lede">开源仓库和个人作品。</p>
+            <p class="page-count" data-i18n="projects.count" data-i18n-n={projects.length}>共 {projects.length} 个</p>
+        </div>
+    </header>
+
+    <div class="container section">
+        {
+            usedFallback && (
+                <p class="fallback-note" role="status">
+                    <span aria-hidden="true">⚠︎</span>
+                    <span data-i18n="projects.fallbackNote">
+                        GitHub 接口暂不可用，以下为本地记录的项目。
+                    </span>
+                </p>
+            )
+        }
+
+        <p class="source-note">
+            <span data-i18n="projects.source">数据来源</span>
+            {
+                usedFallback ? (
+                    <span data-i18n="projects.localSource">本地记录</span>
+                ) : (
+                    <a href={`https://github.com/${GITHUB_USERNAME}`} target="_blank" rel="noopener noreferrer">
+                        github.com/{GITHUB_USERNAME}
+                    </a>
+                )
+            }
+        </p>
+
+        <div class="projects-grid">
+            {
+                projects.map((project, index) => (
+                    <ProjectCard {...project} position={`${String(index + 1).padStart(2, '0')}`} />
+                ))
+            }
+        </div>
     </div>
-  </div>
 </BaseLayout>
 
 <style>
-  .section {
-    padding: 5rem 1rem 4rem;
-    max-width: var(--max-width);
-    margin: 0 auto;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 2.5rem;
-    color: var(--color-text);
-    text-align: center;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
+    .page-count {
+        margin-top: 1.25rem;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        letter-spacing: 0.12em;
+        color: var(--color-text-tertiary);
+    }
 
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
-  }
-  
-  /* 项目卡片已使用液态玻璃效果 (ProjectCard.astro) */
-  /* 8% 透明度 + blur(40px) saturate(180%) + 三层阴影 */
+    .section {
+        padding: 2.5rem 1.5rem 5rem;
+    }
+
+    .fallback-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+        margin-bottom: 1.5rem;
+        padding: 0.875rem 1rem;
+        background: var(--color-primary-light);
+        border-left: 3px solid var(--color-primary);
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: var(--color-text-secondary);
+    }
+
+    .source-note {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        color: var(--color-text-tertiary);
+    }
+
+    .source-note a {
+        color: var(--color-primary);
+        text-decoration: none;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .source-note a:hover {
+        border-bottom-color: var(--color-primary);
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+        .section {
+            padding: 2rem 1.5rem 3.5rem;
+        }
+    }
 </style>

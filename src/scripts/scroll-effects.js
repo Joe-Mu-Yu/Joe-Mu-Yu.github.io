@@ -1,53 +1,128 @@
 /**
- * 滚动交互效果 - 文章详情页
- * 功能：文章头部视差滚动、返回顶部按钮状态
+ * Site motion runtime.
+ *
+ * Two jobs, one scroll loop:
+ *   1. Parallax for elements carrying data-depth inside a data-scene section.
+ *   2. Reveal-on-enter for anything carrying data-reveal.
+ *
+ * Rules that keep this from feeling cheap:
+ *   - No wheel hijacking, no scroll hijacking, no forced horizontal scroll.
+ *   - Everything runs from one requestAnimationFrame tick per frame.
+ *   - The reveal "hidden" state is added by JS only, so a page with no JS (or
+ *     a failed script) still shows all content.
+ *   - prefers-reduced-motion disables both systems.
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-  const postHeader = document.querySelector('.post-header');
-  const postContent = document.querySelector('.post-content');
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  if (!postHeader) return;
+function initReveal() {
+  const targets = Array.from(document.querySelectorAll('[data-reveal]'));
+  if (targets.length === 0) return () => {};
+
+  // Stagger siblings so a grid cascades instead of popping in as one block.
+  targets.forEach((el) => {
+    if (el.dataset.revealDelay) return;
+    const siblings = el.parentElement
+      ? Array.from(el.parentElement.children).filter((c) => c.hasAttribute('data-reveal'))
+      : [];
+    const index = siblings.indexOf(el);
+    if (index > 0) {
+      el.style.setProperty('--reveal-delay', `${Math.min(index, 6) * 70}ms`);
+    }
+  });
+
+  if (REDUCED_MOTION.matches || !('IntersectionObserver' in window)) {
+    targets.forEach((el) => el.classList.add('is-revealed'));
+    return () => {};
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('is-revealed');
+        observer.unobserve(entry.target);
+      }
+    },
+    { rootMargin: '0px 0px -12% 0px', threshold: 0.08 },
+  );
+
+  targets.forEach((el) => observer.observe(el));
+  return () => observer.disconnect();
+}
+
+function initParallax() {
+  if (REDUCED_MOTION.matches) return () => {};
+  const scenes = Array.from(document.querySelectorAll('[data-scene]'));
+  if (scenes.length === 0) return () => {};
+
+  const layers = scenes.flatMap((scene) =>
+    Array.from(scene.querySelectorAll('[data-depth]')).map((el) => ({
+      el,
+      depth: Number(el.dataset.depth) || 0,
+      scene,
+    })),
+  );
+  if (layers.length === 0) return () => {};
 
   let ticking = false;
-  let lastScrollY = 0;
 
-  function onScroll() {
-    lastScrollY = window.scrollY;
-    if (!ticking) {
-      window.requestAnimationFrame(update);
-      ticking = true;
+  function update() {
+    ticking = false;
+    const viewport = window.innerHeight;
+
+    for (const layer of layers) {
+      const rect = layer.scene.getBoundingClientRect();
+
+      // Only touch layers while their scene is on screen. Off-screen work is
+      // wasted layout math and is what makes parallax stutter on long pages.
+      if (rect.bottom < -viewport || rect.top > viewport * 2) continue;
+
+      // -1 (near) .. 1 (far), 0 at the moment the scene centre crosses the
+      // viewport centre.
+      const progress =
+        (rect.top + rect.height / 2 - viewport / 2) / (viewport / 2 + rect.height / 2);
+      const offset = progress * layer.depth * 60;
+
+      layer.el.style.setProperty('--parallax-y', `${offset.toFixed(2)}px`);
     }
   }
 
-  function update() {
-    const scrollY = lastScrollY;
-    const headerHeight = postHeader.offsetHeight;
-
-    // 文章头部视差效果 - 轻微上移 + 透明度渐变
-    if (scrollY < headerHeight * 1.5) {
-      const progress = Math.min(scrollY / (headerHeight * 1.2), 1);
-      const translateY = scrollY * 0.15;
-      const opacity = 1 - progress * 0.3;
-
-      postHeader.style.transform = `translateY(${translateY}px)`;
-      postHeader.style.opacity = String(Math.max(opacity, 0.7));
-    } else {
-      postHeader.style.transform = 'translateY(0)';
-      postHeader.style.opacity = '0.7';
-    }
-
-    // 文章内容区轻微视差
-    if (postContent && scrollY > headerHeight) {
-      const contentProgress = Math.min((scrollY - headerHeight) / 200, 1);
-      postContent.style.transform = `translateY(${contentProgress * 4}px)`;
-    }
-
-    ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(update);
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
-
-  // 初始化
+  window.addEventListener('resize', onScroll, { passive: true });
   update();
-});
+
+  return () => {
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', onScroll);
+  };
+}
+
+function initRevealClass() {
+  // Only now do hidden reveal states apply, which keeps content visible when
+  // scripting is off.
+  document.documentElement.classList.add('js-reveal');
+}
+
+function start() {
+  initRevealClass();
+  const teardown = [initReveal(), initParallax()];
+
+  if (REDUCED_MOTION.addEventListener) {
+    REDUCED_MOTION.addEventListener('change', () => window.location.reload());
+  }
+
+  return () => teardown.forEach((fn) => fn && fn());
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', start, { once: true });
+} else {
+  start();
+}

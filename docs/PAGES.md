@@ -258,6 +258,6 @@ Astro 基于文件系统的路由：
 
 ## 📚 相关文档
 
-- [组件库](../components/README.md)
-- [全局样式](../styles/README.md)
-- [国际化](../i18n/README.md)
+- [组件库](../src/components/README.md)
+- [全局样式](../src/styles/README.md)
+- [国际化](../src/i18n/index.ts)

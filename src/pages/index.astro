@@ -2,373 +2,234 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import CategoryTag from '../components/CategoryTag.astro';
+import HeroCollage from '../components/HeroCollage.astro';
 import Button from '../components/Button.astro';
+import { fetchProjects } from '../lib/github';
+import { getSortedPosts } from '../lib/posts';
 
-// 示例文章数据 - 请替换为你自己的内容
-// 获取最新的文章（取前3篇）
-const allPosts = await Astro.glob('./posts/*.md');
-const posts = allPosts
-  .sort((a, b) => new Date(b.frontmatter.date).valueOf() - new Date(a.frontmatter.date).valueOf())
-  .slice(0, 3)
-  .map(post => ({
-    title: post.frontmatter.title,
-    description: post.frontmatter.description,
-    date: new Date(post.frontmatter.date),
-    tags: post.frontmatter.tags,
-    href: post.url
-  }));
-
-// 从 GitHub API 获取项目数据（与项目页同步）
-const GITHUB_USERNAME = 'Joe-Mu-Yu';
-const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=50`;
-
-const manualProjects = [
-  {
-    title: 'Joe-Mu-Yu.github.io',
-    description: '个人博客网站，采用 Astro 构建，白色透明毛玻璃设计风格',
-    href: 'https://github.com/Joe-Mu-Yu/Joe-Mu-Yu.github.io',
-    icon: '🌐',
-    language: 'TypeScript',
-    stars: 0,
-    forks: 0
-  }
-];
-
-async function fetchGitHubRepos() {
-  try {
-    const response = await fetch(GITHUB_API);
-    if (!response.ok) throw new Error('Failed to fetch GitHub repos');
-    const repos = await response.json();
-    
-    const originalRepos = repos.filter(repo => !repo.fork);
-    
-    const githubProjects = originalRepos.map(repo => ({
-      title: repo.name,
-      description: repo.description || '暂无描述',
-      href: repo.html_url,
-      language: repo.language,
-      stars: repo.stargazers_count,
-      forks: repo.forks_count,
-      updatedAt: new Date(repo.updated_at).toLocaleDateString('zh-CN'),
-      icon: getRepoIcon(repo.name)
+const posts = (await getSortedPosts())
+    .slice(0, 3)
+    .map((post) => ({
+        title: post.frontmatter.title,
+        description: post.frontmatter.description ?? '',
+        date: new Date(post.frontmatter.date),
+        tags: post.frontmatter.tags,
+        href: post.url,
     }));
-    
-    const existingTitles = new Set(githubProjects.map(p => p.title));
-    const additionalProjects = manualProjects.filter(p => !existingTitles.has(p.title));
-    
-    return [...githubProjects, ...additionalProjects];
-  } catch (error) {
-    console.error('Error fetching GitHub repos:', error);
-    return manualProjects;
-  }
-}
 
-function getRepoIcon(repoName: string): string {
-  const iconMap: Record<string, string> = {
-    'OpenIsle': '🏝️',
-    'weekly': '📰',
-    'pythermalcomfort': '🌡️',
-    'Learn_Prompting': '📚',
-    'blog': '📝',
-    'website': '🌐',
-    'app': '📱',
-    'tool': '🔧',
-    'ai': '🤖',
-    'web': '🕸️'
-  };
-  
-  for (const [key, icon] of Object.entries(iconMap)) {
-    if (repoName.toLowerCase().includes(key.toLowerCase())) {
-      return icon;
-    }
-  }
-  
-  return '🚀';
-}
-
-const allProjects = await fetchGitHubRepos();
-const projects = allProjects.slice(0, 3);
-
-const categories = ['前端', '项目', '工具', '生活'];
+const { projects, usedFallback } = await fetchProjects();
+const featuredProjects = projects.slice(0, 3);
+const lifePostCount = 0;
 ---
 
-<BaseLayout title="Morgan - Personal Blog">
-  <section class="hero container">
-    <div class="hero-content">
-      <div class="hero-text">
-        <h1 data-i18n="home.greeting">Hi, Morgan</h1>
-        <p class="bio" data-i18n="home.bio">
-          编程爱好者 / AI爱好者 / 探索生活的美好
-        </p>
-        <div class="social-links">
-          <Button variant="outline" href="https://github.com/Joe-Mu-Yu">GitHub</Button>
+<BaseLayout title="Morgan — 个人博客" description="Morgan 的个人博客：代码、AI 与生活记录。" titleKey="meta.homeTitle" descriptionKey="meta.homeDescription">
+    <section class="hero container">
+        <div class="hero-copy">
+            <p class="eyebrow" data-i18n="home.eyebrow">个人博客 / 2019—至今</p>
+            <h1 class="hero-title" data-i18n="home.greeting">你好，我是 Morgan</h1>
+            <p class="hero-bio" data-i18n="home.bio">
+                写代码、跟模型较劲，也记录一些没被写进文档的东西。这里的文章大多来自真实踩坑：踩过、查过、写下结论。
+            </p>
+            <div class="hero-actions">
+                <Button href="/posts" data-i18n="home.primaryCta">看文章</Button>
+                <Button href="https://github.com/Joe-Mu-Yu" variant="secondary">
+                    <span data-i18n="home.secondaryCta">GitHub</span>
+                </Button>
+            </div>
         </div>
-      </div>
-      <div class="hero-avatar">
-        <img src="/avatar.jpg" alt="Morgan" />
-      </div>
-    </div>
-  </section>
 
-  <section class="section container">
-    <div class="section-header">
-      <h2 data-i18n="home.articles">文章</h2>
-      <div class="categories">
-        {categories.map(cat => <CategoryTag tag={cat} />)}
-      </div>
-    </div>
-    
-    <div class="posts-grid">
-      {posts.map(post => (
-        <ArticleCard {...post} />
-      ))}
-    </div>
-    
-    <div class="view-more">
-      <Button href="/posts" variant="secondary"><span data-i18n="home.viewAllPosts">查看所有文章</span></Button>
-    </div>
-  </section>
+        <div class="hero-collage">
+            <HeroCollage />
+        </div>
+    </section>
 
-  <section class="section container">
-    <div class="section-header">
-      <h2 data-i18n="home.projectsTitle">项目</h2>
-    </div>
-    
-    <div class="projects-grid">
-      {projects.map(project => (
-        <ProjectCard {...project} />
-      ))}
-    </div>
-    
-    <div class="view-more">
-      <Button href="/projects" variant="secondary"><span data-i18n="home.viewAllProjects">查看所有项目</span></Button>
-    </div>
-  </section>
+    <section class="section container" aria-labelledby="posts-heading">
+        <header class="section-head">
+            <div>
+                <p class="section-index" data-i18n="home.postsIndex">01 / 文章</p>
+                <h2 id="posts-heading" data-i18n="home.posts">文章</h2>
+            </div>
+            <Button href="/posts" variant="ghost">
+                <span data-i18n="home.viewAllPosts">全部文章</span>
+            </Button>
+        </header>
 
-  <section class="section container">
-    <div class="section-header">
-      <h2 data-i18n="home.lifeTitle">生活</h2>
-    </div>
-    
-    <div class="life-content">
-      <p class="life-description">分享生活中的点滴瞬间和感悟</p>
-      <div class="life-placeholder">
-        <p>生活相关的文章将显示在这里...</p>
-      </div>
-    </div>
-    
-    <div class="view-more">
-      <Button href="/life" variant="secondary"><span data-i18n="home.viewAllLife">查看全部生活</span></Button>
-    </div>
-  </section>
+        <div class="post-list">
+            {posts.map((post) => <ArticleCard {...post} />)}
+        </div>
+    </section>
+
+    <section class="section container" aria-labelledby="projects-heading">
+        <header class="section-head">
+            <div>
+                <p class="section-index" data-i18n="home.projectsIndex">02 / 项目</p>
+                <h2 id="projects-heading" data-i18n="home.projects">项目</h2>
+            </div>
+            <Button href="/projects" variant="ghost">
+                <span data-i18n="home.viewAllProjects">全部项目</span>
+            </Button>
+        </header>
+
+        {
+            usedFallback && (
+                <p class="fallback-note" role="status">
+                    <span aria-hidden="true">⚠︎</span>
+                    <span data-i18n="home.projectsFallback">
+                        GitHub 接口暂不可用，以下为本地记录的项目。
+                    </span>
+                </p>
+            )
+        }
+
+        <div class="project-grid">
+            {
+                featuredProjects.map((project, index) => (
+                    <ProjectCard {...project} position={`${String(index + 1).padStart(2, '0')}`} />
+                ))
+            }
+        </div>
+    </section>
+
+    <section class="section container" aria-labelledby="life-heading">
+        <header class="section-head">
+            <div>
+                <p class="section-index" data-i18n="home.lifeIndex">03 / 生活</p>
+                <h2 id="life-heading" data-i18n="home.life">生活</h2>
+            </div>
+            <Button href="/life" variant="ghost">
+                <span data-i18n="home.viewAllLife">进入生活</span>
+            </Button>
+        </header>
+
+        <div class="empty-state" data-reveal>
+            <p class="empty-index">000</p>
+            <h2 data-i18n="life.emptyTitle">这里还没有文章</h2>
+            <p data-i18n="life.emptyBody">
+                生活栏目还没有发布任何内容。等第一篇写完，它会出现在这个位置。
+            </p>
+            <p class="life-count" data-i18n="life.count" data-i18n-n={lifePostCount}>共 {lifePostCount} 篇</p>
+        </div>
+    </section>
 </BaseLayout>
 
 <style>
-  .hero {
-    padding: 8rem 1rem 5rem;
-  }
-
-  .hero-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4rem;
-    max-width: 960px;
-    margin: 0 auto;
-    
-    /* 液态玻璃容器 */
-    background: var(--glass-bg-light);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border-radius: var(--border-radius-lg);
-    padding: 3rem;
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-glass);
-  }
-
-  .hero-text {
-    flex: 1;
-    text-align: left;
-    max-width: 540px;
-  }
-
-  .hero-avatar {
-    flex-shrink: 0;
-  }
-
-  .hero-avatar img {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: var(--shadow-glass);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 4px solid var(--glass-border);
-  }
-
-  .hero-avatar img:hover {
-    transform: scale(1.03);
-  }
-
-  h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 1.25rem;
-    color: var(--color-text);
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-  }
-
-  .bio {
-    font-size: 1.125rem;
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-    margin-bottom: 2rem;
-    max-width: 480px;
-  }
-
-  .social-links {
-    display: flex;
-    justify-content: flex-start;
-    gap: 0.75rem;
-  }
-
-  .section {
-    padding: 5rem 1rem;
-    max-width: var(--max-width);
-    margin: 0 auto;
-  }
-
-  .section-header {
-    margin-bottom: 2.5rem;
-  }
-
-  h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: var(--color-text);
-    letter-spacing: -0.01em;
-  }
-
-  .categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .posts-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
-  }
-
-  .life-content {
-    /* 液态玻璃效果 */
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-glass);
-    border-radius: var(--border-radius-lg);
-    padding: 2rem;
-    text-align: center;
-  }
-
-  .life-description {
-    font-size: 1rem;
-    color: var(--color-text-secondary);
-    margin-bottom: 1.5rem;
-    line-height: 1.8;
-  }
-
-  .life-placeholder {
-    padding: 3rem 1.5rem;
-    color: var(--color-text-tertiary);
-    font-style: italic;
-    background: var(--glass-bg-light);
-    border-radius: var(--border-radius-lg);
-    border: 1px dashed var(--glass-border);
-  }
-
-  .view-more {
-    margin-top: 2rem;
-    text-align: center;
-  }
-
-  @media (max-width: 768px) {
     .hero {
-      padding: 6rem 1rem 4rem;
-    }
-    
-    h1 { 
-      font-size: 2.25rem; 
-    }
-    
-    .hero-content {
-      flex-direction: column;
-      text-align: center;
-      gap: 2.5rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+        gap: 4rem;
+        align-items: center;
+        padding: 5rem 1.5rem 6rem;
     }
 
-    .hero-text {
-      text-align: center;
-      max-width: 100%;
+    .hero-copy {
+        max-width: 34rem;
     }
 
-    .social-links {
-      justify-content: center;
+    .hero-title {
+        margin-top: 1.25rem;
+        font-family: var(--font-display);
+        font-size: clamp(2.75rem, 6.5vw, 5.25rem);
+        font-weight: 800;
+        line-height: 0.94;
+        letter-spacing: -0.04em;
+        text-wrap: balance;
     }
 
-    .hero-avatar img {
-      width: 160px;
-      height: 160px;
+    .hero-bio {
+        margin-top: 1.75rem;
+        font-size: 1.0625rem;
+        line-height: 1.8;
+        color: var(--color-text-secondary);
+        max-width: 46ch;
     }
-    
-    .bio {
-      margin: 0 auto 2rem;
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 2.25rem;
     }
-  }
+
+    .section {
+        padding: 4.5rem 1.5rem;
+        border-top: 1px solid var(--color-rule);
+    }
+
+    .section-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .section-head h2 {
+        margin-top: 0.5rem;
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 4.5vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .post-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .project-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .fallback-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+        margin-bottom: 1.75rem;
+        padding: 0.875rem 1rem;
+        background: var(--color-primary-light);
+        border-left: 3px solid var(--color-primary);
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: var(--color-text-secondary);
+    }
+
+    .life-count {
+        margin-top: 1.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        color: var(--color-text-tertiary);
+    }
+
+    @media (max-width: 1024px) {
+        .hero {
+            grid-template-columns: 1fr;
+            gap: 3.5rem;
+            padding: 3.5rem 1.5rem 4.5rem;
+        }
+
+        .hero-copy {
+            max-width: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .hero {
+            padding: 2.5rem 1.5rem 4rem;
+        }
+
+        .section {
+            padding: 3.5rem 1.5rem;
+        }
+
+        .section-head {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.25rem;
+        }
+    }
 </style>
-
-<script>
-  import { translations, type Language } from '../i18n/index.ts';
-
-  function updateLanguage() {
-    const lang = (localStorage.getItem('language') || 'zh') as Language;
-    const elements = document.querySelectorAll('[data-i18n]');
-    
-    elements.forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (key) {
-        const keys = key.split('.');
-        let value: any = translations[lang];
-        
-        for (const k of keys) {
-          if (value && typeof value === 'object') {
-            value = value[k];
-          }
-        }
-        
-        if (typeof value === 'string') {
-          el.textContent = value;
-        }
-      }
-    });
-  }
-
-  // 页面加载时更新语言
-  updateLanguage();
-
-  // 监听语言切换事件
-  window.addEventListener('languageChanged', () => {
-    updateLanguage();
-  });
-</script>

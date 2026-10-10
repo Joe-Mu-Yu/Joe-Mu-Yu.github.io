@@ -1,68 +1,121 @@
 ---
 const today = new Date();
-const startDate = new Date('2024-01-01'); // 博客开始运行日期
-const daysRunning = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+const startDate = new Date('2024-01-01');
+const daysRunning = Math.max(0, Math.floor((today.getTime() - startDate.getTime()) / 86400000));
+const year = today.getFullYear();
 ---
 
-<footer>
-  <div class="container">
-    <p>
-      &copy; {today.getFullYear()} Morgan. All rights reserved.
-      <span class="separator">|</span>
-      <a href="/rss.xml">RSS</a>
-    </p>
-    <p class="runtime">已运行 {daysRunning} 天</p>
-  </div>
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <span class="footer-mark" aria-hidden="true">M</span>
+                <div>
+                    <p class="footer-name">Morgan</p>
+                    <p class="footer-note" data-i18n="footer.builtWith">用 Astro 构建</p>
+                </div>
+            </div>
+
+            <nav class="footer-links" aria-label="页脚导航" data-i18n-attr="aria-label:nav.footerLabel">
+                <a href="/posts" data-i18n="nav.posts">文章</a>
+                <a href="/projects" data-i18n="nav.projects">项目</a>
+                <a href="/life" data-i18n="nav.life">生活</a>
+                <a href="/about" data-i18n="nav.about">关于</a>
+                <a href="/rss.xml" data-i18n="footer.rss">RSS</a>
+                <a href="mailto:joerocker516@gmail.com">Email</a>
+            </nav>
+
+            <p class="footer-meta">
+                <span>&copy; {year} Morgan</span>
+                <span class="footer-runtime" data-i18n="footer.running" data-i18n-n={daysRunning}>已运行 {daysRunning} 天</span>
+            </p>
+        </div>
+    </div>
 </footer>
 
 <style>
-  footer {
-    padding: 3rem 0 2rem;
-    margin-top: 6rem;
-    text-align: center;
-  }
-  
-  .container {
-    padding: 1.5rem;
-    max-width: var(--max-width);
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-  
-  p {
-    font-size: 0.875rem;
-    color: var(--color-text-tertiary);
-    line-height: 1.6;
-  }
-  
-  a {
-    color: var(--color-text-secondary);
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-  }
-  
-  a:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-light);
-    text-decoration: none;
-  }
-  
-  .separator {
-    margin: 0 0.5rem;
-    opacity: 0.3;
-  }
-  
-  .runtime {
-    margin-top: 0.75rem;
-    font-size: 0.8125rem;
-    color: var(--color-text-tertiary);
-    display: inline-block;
-  }
+    .site-footer {
+        margin-top: 7rem;
+        border-top: 1px solid var(--color-rule);
+        padding: 3rem 0 3.5rem;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2.5rem 2rem;
+        align-items: start;
+    }
+
+    .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.875rem;
+    }
+
+    .footer-mark {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        background: var(--color-text);
+        color: var(--color-bg);
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.25rem;
+        letter-spacing: -0.03em;
+    }
+
+    .footer-name {
+        font-family: var(--font-display);
+        font-size: 1.0625rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .footer-note {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-text-tertiary);
+        letter-spacing: 0.06em;
+    }
+
+    .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1.25rem;
+    }
+
+    .footer-links a {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap-target);
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        transition: color 0.2s var(--ease-snap);
+    }
+
+    .footer-links a:hover {
+        color: var(--color-primary);
+    }
+
+    .footer-meta {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.25rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--color-rule);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        color: var(--color-text-tertiary);
+    }
+
+    @media (max-width: 720px) {
+        .footer-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>

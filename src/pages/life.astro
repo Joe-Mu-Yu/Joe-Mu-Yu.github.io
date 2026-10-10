@@ -1,58 +1,52 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+// The Life column has no posts yet. There is no glob here on purpose: the
+// empty state below is the real state of the section, not a placeholder.
+const lifePostCount = 0;
 ---
 
-<BaseLayout title="生活 - Morgan">
-  <div class="container section">
-    <h1>生活</h1>
-    <div class="content">
-      <p>分享生活中的点滴瞬间和感悟</p>
-      
-      <div class="life-posts">
-        <p class="placeholder">生活相关的文章将显示在这里...</p>
-      </div>
+<BaseLayout title="生活 - Morgan" description="Morgan 的生活篇段。" titleKey="meta.lifeTitle" descriptionKey="meta.lifeDescription">
+    <header class="page-head">
+        <div class="container">
+            <p class="eyebrow" data-i18n="home.lifeIndex">03 / 生活</p>
+            <h1 data-i18n="life.title">生活</h1>
+            <p class="lede" data-i18n="life.lede">计划记录生活中的片段。</p>
+        </div>
+    </header>
+
+    <div class="container section">
+        <div class="empty-state" data-reveal>
+            <p class="empty-index">000</p>
+            <h2 data-i18n="life.emptyTitle">这里还没有文章</h2>
+            <p data-i18n="life.emptyBody">
+                生活栏目还没有发布任何内容。等第一篇写完，它会出现在这个位置。
+            </p>
+            <p class="empty-count" data-i18n="life.count" data-i18n-n={lifePostCount}>共 {lifePostCount} 篇</p>
+        </div>
     </div>
-  </div>
 </BaseLayout>
 
 <style>
-  .section {
-    padding: 5rem 1rem 4rem;
-    max-width: var(--max-width-narrow);
-    margin: 0 auto;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    color: var(--color-text);
-    text-align: center;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
+    .section {
+        padding: 3rem 1.5rem 5rem;
+    }
 
-  .content {
-    font-size: 1rem;
-    color: var(--color-text-secondary);
-    line-height: 1.8;
-  }
+    .empty-count {
+        margin-top: 1.5rem !important;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.12em;
+        color: var(--color-text-tertiary);
+    }
 
-  .life-posts {
-    margin-top: 2.5rem;
-  }
+    @media (max-width: 640px) {
+        .section {
+            padding: 2rem 1.5rem 3.5rem;
+        }
 
-  .placeholder {
-    text-align: center;
-    padding: 3rem 1.5rem;
-    color: var(--color-text-tertiary);
-    font-style: italic;
-    
-    /* 液态玻璃效果 */
-    background: var(--glass-bg);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-glass);
-  }
+        .empty-state {
+            padding: 2.5rem 1.25rem;
+        }
+    }
 </style>

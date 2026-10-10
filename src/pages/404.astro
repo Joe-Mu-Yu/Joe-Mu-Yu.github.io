@@ -3,41 +3,49 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
 ---
 
-<BaseLayout title="404 Not Found">
-  <div class="container section">
-    <h1>404</h1>
-    <p>页面未找到。或者它从未存在过。</p>
-    <div class="actions">
-      <Button href="/">返回首页</Button>
+<BaseLayout title="404 - Morgan" titleKey="meta.notFoundTitle">
+    <div class="container section">
+        <p class="eyebrow">404</p>
+        <h1 data-i18n="notFound.title">404</h1>
+        <p class="body" data-i18n="notFound.body">页面未找到，或者它从未存在过。</p>
+        <div class="actions">
+            <Button href="/">
+                <span data-i18n="notFound.cta">回到首页</span>
+            </Button>
+            <Button href="/posts" variant="ghost">
+                <span data-i18n="notFound.posts">看看文章</span>
+            </Button>
+        </div>
     </div>
-  </div>
 </BaseLayout>
 
 <style>
-  .section {
-    padding: 10rem 1rem 8rem;
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
-  h1 {
-    font-size: 6rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: var(--color-text);
-    line-height: 1;
-    letter-spacing: -0.03em;
-  }
+    .section {
+        padding: 9rem 1.5rem 7rem;
+        text-align: left;
+    }
 
-  p {
-    font-size: 1.125rem;
-    color: var(--color-text-secondary);
-    margin-bottom: 2.5rem;
-    line-height: 1.6;
-  }
-  
-  .actions {
-    margin-top: 2rem;
-  }
+    h1 {
+        margin: 1rem 0 0;
+        font-family: var(--font-display);
+        font-size: clamp(5rem, 20vw, 12rem);
+        font-weight: 800;
+        line-height: 0.85;
+        letter-spacing: -0.05em;
+    }
+
+    .body {
+        margin-top: 1.75rem;
+        max-width: 40ch;
+        font-size: 1.0625rem;
+        line-height: 1.75;
+        color: var(--color-text-secondary);
+    }
+
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 2.25rem;
+    }
 </style>

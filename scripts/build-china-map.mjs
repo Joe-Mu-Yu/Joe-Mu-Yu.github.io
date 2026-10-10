@@ -1,0 +1,160 @@
+// Regenerates src/data/china-map.ts — the simplified China outline and city
+// pins used by the About page map (src/components/InteractiveMap.astro).
+//
+//   node scripts/build-china-map.mjs
+//
+// Source: DataV province boundary GeoJSON for the whole country. The outline
+// is simplified with Douglas–Peucker and fitted into the map viewBox with a
+// small margin so coordinate ticks have room; city positions are projected with
+// the same transform, so pins always sit on the right spot.
+import { writeFileSync } from 'node:fs';
+
+const SOURCE = 'https://geo.datav.aliyun.com/areas_v3/bound/100000.json';
+const OUT = new URL('../src/data/china-map.ts', import.meta.url);
+
+const VIEW_W = 440;
+const VIEW_H = 320;
+const FIT = 0.9; // leave a margin around the land for ticks and furniture
+const LON0 = 73.5;
+const LAT1 = 53.55;
+const K = Math.cos((35 * Math.PI) / 180); // equirectangular, standard parallel 35°N
+const EPS = 0.1; // Douglas–Peucker tolerance, in projected degrees
+const MIN_AREA = 0.0008; // fraction of the mainland; keeps Hainan + Taiwan
+
+const CITIES = [
+    { key: 'beijing', name: '北京', lon: 116.4074, lat: 39.9042 },
+    { key: 'shijiazhuang', name: '石家庄', lon: 114.5149, lat: 38.0428 },
+    { key: 'taiyuan', name: '太原', lon: 112.5492, lat: 37.857 },
+    { key: 'xian', name: '西安', lon: 108.9398, lat: 34.3416 },
+    { key: 'jinan', name: '济南', lon: 117.1201, lat: 36.6512 },
+    { key: 'qingdao', name: '青岛', lon: 120.3826, lat: 36.0671 },
+];
+
+const response = await fetch(SOURCE);
+if (!response.ok) throw new Error(`fetch failed: ${response.status}`);
+const geo = await response.json();
+
+const outerRings = [];
+for (const feature of geo.features) {
+    const { type, coordinates } = feature.geometry;
+    if (type === 'Polygon') outerRings.push(coordinates[0]);
+    else if (type === 'MultiPolygon') coordinates.forEach((poly) => outerRings.push(poly[0]));
+}
+
+const project = ([lon, lat]) => [(lon - LON0) * K, LAT1 - lat];
+
+function area(pts) {
+    let a = 0;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        a += pts[j][0] * pts[i][1] - pts[i][0] * pts[j][1];
+    }
+    return Math.abs(a) / 2;
+}
+
+function simplify(pts, eps) {
+    if (pts.length < 4) return pts;
+    const keep = new Uint8Array(pts.length);
+    keep[0] = keep[pts.length - 1] = 1;
+    const stack = [[0, pts.length - 1]];
+    while (stack.length) {
+        const [first, last] = stack.pop();
+        const [x1, y1] = pts[first];
+        const [x2, y2] = pts[last];
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy);
+        let maxDist = 0;
+        let index = -1;
+        for (let i = first + 1; i < last; i++) {
+            const [px, py] = pts[i];
+            // Closed rings start and end on the same vertex; fall back to the
+            // distance from that vertex so the first split still happens.
+            const dist =
+                len < 1e-9
+                    ? Math.hypot(px - x1, py - y1)
+                    : Math.abs(dy * px - dx * py + x2 * y1 - y2 * x1) / len;
+            if (dist > maxDist) {
+                maxDist = dist;
+                index = i;
+            }
+        }
+        if (maxDist > eps && index > 0) {
+            keep[index] = 1;
+            stack.push([first, index], [index, last]);
+        }
+    }
+    return pts.filter((_, i) => keep[i]);
+}
+
+const projected = outerRings.map((ring) => ring.map(project));
+const mainlandArea = Math.max(...projected.map(area));
+const kept = projected
+    .filter((ring) => area(ring) > mainlandArea * MIN_AREA)
+    .map((ring) => simplify(ring, EPS))
+    .sort((a, b) => area(b) - area(a));
+
+let minX = Infinity;
+let minY = Infinity;
+let maxX = -Infinity;
+let maxY = -Infinity;
+for (const ring of kept) {
+    for (const [x, y] of ring) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+    }
+}
+
+const scale = Math.min(VIEW_W / (maxX - minX), VIEW_H / (maxY - minY)) * FIT;
+const offX = (VIEW_W - (maxX - minX) * scale) / 2;
+const offY = (VIEW_H - (maxY - minY) * scale) / 2;
+const toView = ([x, y]) => [(x - minX) * scale + offX, (y - minY) * scale + offY];
+
+function toPath(ring) {
+    const pts = ring.map(toView);
+    const f = (n) => {
+        const r = n.toFixed(1);
+        return r.endsWith('.0') ? r.slice(0, -2) : r;
+    };
+    let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+    for (let i = 1; i < pts.length; i++) d += `L${f(pts[i][0])} ${f(pts[i][1])}`;
+    return `${d}Z`;
+}
+
+const paths = kept.map(toPath);
+const pins = CITIES.map((city) => {
+    const [x, y] = toView(project([city.lon, city.lat]));
+    return {
+        ...city,
+        x: Number(x.toFixed(1)),
+        y: Number(y.toFixed(1)),
+        left: `${((x / VIEW_W) * 100).toFixed(2)}%`,
+        top: `${((y / VIEW_H) * 100).toFixed(2)}%`,
+    };
+});
+
+const points = kept.reduce((n, ring) => n + ring.length, 0);
+const out = `// Generated by scripts/build-china-map.mjs — do not edit by hand.
+// Simplified China outline (${points} points, ${paths.length} polygons) plus the
+// visited-city pins, all projected through the same transform so the pins land
+// exactly on the outline.
+
+export const CHINA_VIEW_BOX = '0 0 ${VIEW_W} ${VIEW_H}';
+
+export const CHINA_LAND_PATHS = [
+${paths.map((p) => `    '${p}',`).join('\n')}
+];
+
+export const CHINA_PINS = [
+${pins
+    .map(
+        (p) =>
+            `    { key: '${p.key}', name: '${p.name}', left: '${p.left}', top: '${p.top}', x: ${p.x}, y: ${p.y} },`,
+    )
+    .join('\n')}
+];
+`;
+
+writeFileSync(OUT, out);
+console.log(`china-map.ts: ${paths.length} polygons, ${points} points, pins at`, pins.map((p) => `${p.name} ${p.left}/${p.top}`).join(', '));
